@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using NetworkMapper.Application.Dtos.Abstractions;
 using NetworkMapper.Application.Shared.Helpers;
+using NetworkMapper.Contracts.Abstractions;
 using NetworkMapper.Domain.Abstractions.Constants;
 
 namespace NetworkMapper.Application.Validation.Shared;

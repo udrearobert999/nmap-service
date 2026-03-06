@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NetworkMapper.Application.Worker\NetworkMapper.Application.Worker.csproj" />
+      <ProjectReference Include="..\NetworkMapper.Infrastructure.Persistence\NetworkMapper.Infrastructure.Persistence.csproj" />
+    </ItemGroup>
+
+</Project>

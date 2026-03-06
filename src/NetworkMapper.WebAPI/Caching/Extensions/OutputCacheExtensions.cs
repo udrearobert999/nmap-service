@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.OutputCaching;
-using NetworkMapper.Application.Dtos.Scans.Options;
 using NetworkMapper.Application.Shared.Helpers;
+using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.WebAPI.Caching.Constants;
 
 namespace NetworkMapper.WebAPI.Caching.Extensions;

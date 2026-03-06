@@ -1,10 +1,10 @@
-﻿using NetworkMapper.Application.Dtos.Scans.Options;
-using NetworkMapper.Application.Dtos.Scans.Requests;
-using NetworkMapper.Application.Dtos.Scans.Responses;
-using NetworkMapper.Application.Mappers;
+﻿using NetworkMapper.Application.Mappers;
 using NetworkMapper.Application.Services.Abstractions;
 using NetworkMapper.Application.Specifications;
 using NetworkMapper.Application.Validation;
+using NetworkMapper.Contracts.Scans.Options;
+using NetworkMapper.Contracts.Scans.Requests;
+using NetworkMapper.Contracts.Scans.Responses;
 using NetworkMapper.Domain.Abstractions;
 using NetworkMapper.Domain.Results.Generics;
 

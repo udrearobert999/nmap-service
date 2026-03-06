@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using NetworkMapper.Application.Dtos.Scans.Requests;
+using NetworkMapper.Contracts.Scans.Requests;
 using NetworkMapper.Domain.Abstractions;
 
 namespace NetworkMapper.Application.Validation.Scans.Requests;

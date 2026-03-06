@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NetworkMapper.Contracts\NetworkMapper.Contracts.csproj" />
     <ProjectReference Include="..\NetworkMapper.Domain\NetworkMapper.Domain.csproj" />
   </ItemGroup>
 

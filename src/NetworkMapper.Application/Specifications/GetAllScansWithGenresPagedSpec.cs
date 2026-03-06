@@ -1,4 +1,4 @@
-﻿using NetworkMapper.Application.Dtos.Scans.Options;
+﻿using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Domain.Abstractions;
 using NetworkMapper.Domain.Entities;
 

@@ -11,6 +11,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.Infrastructur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.WebAPI", "src\NetworkMapper.WebAPI\NetworkMapper.WebAPI.csproj", "{B23BE9A6-7BBD-4DB3-8ACB-15A331692DAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Worker", "src\NetworkMapper.Worker\NetworkMapper.Worker.csproj", "{EB8100A6-066F-444B-B1F5-D8F1F33F38B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Application.Worker", "src\NetworkMapper.Application.Worker\NetworkMapper.Application.Worker.csproj", "{DAD880E1-B7E0-449A-9A45-8062BE7E4F04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Contracts", "src\NetworkMapper.Contracts\NetworkMapper.Contracts.csproj", "{E50B3A25-3014-46CA-9C79-C2AEFDF0BD8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Infrastructure.Persistence", "src\NetworkMapper.Infrastructure.Persistence\NetworkMapper.Infrastructure.Persistence.csproj", "{9DADF325-283B-4FE7-834C-4B4966143E88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Infrastructure.Worker", "src\NetworkMapper.Infrastructure.Worker\NetworkMapper.Infrastructure.Worker.csproj", "{B3B8534B-EE8E-401D-9E53-3B9BE6A18AFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AAF0325C-EAEA-4AF6-B395-CA52AFDF1150}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yaml = compose.yaml
+		.env = .env
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +49,26 @@ Global
 		{B23BE9A6-7BBD-4DB3-8ACB-15A331692DAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B23BE9A6-7BBD-4DB3-8ACB-15A331692DAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B23BE9A6-7BBD-4DB3-8ACB-15A331692DAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB8100A6-066F-444B-B1F5-D8F1F33F38B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB8100A6-066F-444B-B1F5-D8F1F33F38B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB8100A6-066F-444B-B1F5-D8F1F33F38B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB8100A6-066F-444B-B1F5-D8F1F33F38B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAD880E1-B7E0-449A-9A45-8062BE7E4F04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAD880E1-B7E0-449A-9A45-8062BE7E4F04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAD880E1-B7E0-449A-9A45-8062BE7E4F04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAD880E1-B7E0-449A-9A45-8062BE7E4F04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E50B3A25-3014-46CA-9C79-C2AEFDF0BD8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E50B3A25-3014-46CA-9C79-C2AEFDF0BD8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E50B3A25-3014-46CA-9C79-C2AEFDF0BD8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E50B3A25-3014-46CA-9C79-C2AEFDF0BD8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DADF325-283B-4FE7-834C-4B4966143E88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DADF325-283B-4FE7-834C-4B4966143E88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DADF325-283B-4FE7-834C-4B4966143E88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DADF325-283B-4FE7-834C-4B4966143E88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3B8534B-EE8E-401D-9E53-3B9BE6A18AFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3B8534B-EE8E-401D-9E53-3B9BE6A18AFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3B8534B-EE8E-401D-9E53-3B9BE6A18AFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3B8534B-EE8E-401D-9E53-3B9BE6A18AFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

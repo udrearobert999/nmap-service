@@ -1,6 +1,6 @@
-﻿using NetworkMapper.Application.Dtos.Scans.Options;
-using NetworkMapper.Application.Dtos.Scans.Requests;
-using NetworkMapper.Application.Dtos.Scans.Responses;
+﻿using NetworkMapper.Contracts.Scans.Options;
+using NetworkMapper.Contracts.Scans.Requests;
+using NetworkMapper.Contracts.Scans.Responses;
 using NetworkMapper.Domain.Results.Generics;
 
 namespace NetworkMapper.Application.Services.Abstractions;

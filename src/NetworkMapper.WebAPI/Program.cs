@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Serilog;
 using NetworkMapper.Application;
 using NetworkMapper.Infrastructure;
+using NetworkMapper.Infrastructure.Persistence;
 using NetworkMapper.WebAPI.Caching.Extensions;
 using NetworkMapper.WebAPI.Config;
 using NetworkMapper.WebAPI.Extensions;
@@ -13,6 +14,7 @@ configuration.AddEnvironmentVariables();
 
 builder.Services
     .AddApplication()
+    .AddPersistence(configuration)
     .AddInfrastructure(configuration);
 
 builder.Services
@@ -52,5 +54,7 @@ app.UseOutputCache();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.ApplyMigrations();
 
 app.Run();

@@ -1,6 +1,6 @@
-using NetworkMapper.Application.Dtos.Scans;
-using NetworkMapper.Application.Dtos.Scans.Requests;
-using NetworkMapper.Application.Dtos.Scans.Responses;
+using NetworkMapper.Contracts.Scans;
+using NetworkMapper.Contracts.Scans.Requests;
+using NetworkMapper.Contracts.Scans.Responses;
 using NetworkMapper.Domain.Entities;
 
 namespace NetworkMapper.Application.Mappers;
