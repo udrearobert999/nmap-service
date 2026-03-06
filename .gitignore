@@ -1,0 +1,85 @@
+# --- BUILD RESULTS (Covers /bin and /obj for all IDEs) ---
+[Dd]ebug/
+[Dd][Ee]bugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+
+# --- JETBRAINS RIDER SPECIFIC ---
+.idea/
+*.sln.iml
+*.idea.project.user
+*.idea.user
+*.idea.workspace.xml
+# Rider/ReSharper unit test and coverage cache
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+.cr/personal
+
+# --- VISUAL STUDIO SPECIFIC ---
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.csproj.user
+*.sqlproj.user
+*.pubxml
+*.publishproj
+Generated\ Files/
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# --- LINUX / UBUNTU SYSTEM FILES ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# --- .NET CORE / NUGET ---
+project.lock.json
+project.fragment.lock.json
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# --- DATABASE / SQL ---
+*.mdf
+*.ldf
+*.ndf
+*.db
+*.sqlite
+
+# --- VS CODE (In case of multi-IDE usage) ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+**/bin/
+**/obj/
+*bin\\Debug*
+*obj\\Debug*
