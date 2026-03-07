@@ -15,7 +15,7 @@ internal sealed class IdempotentRequestConfiguration: IEntityTypeConfiguration<I
 
         builder.Property(x => x.Id)
             .IsRequired()
-            .ValueGeneratedNever();
+            .ValueGeneratedOnAdd();
 
         builder
             .Property(x => x.Name)

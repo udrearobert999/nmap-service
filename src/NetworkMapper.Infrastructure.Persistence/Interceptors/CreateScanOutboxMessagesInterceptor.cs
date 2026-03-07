@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using NetworkMapper.Contracts.Scans.Messages;
 using NetworkMapper.Domain.Entities;
+using NetworkMapper.Infrastructure.Persistence.Mappers;
 using Newtonsoft.Json;
 
 namespace NetworkMapper.Infrastructure.Persistence.Interceptors;
@@ -21,17 +23,22 @@ internal sealed class CreateScanOutboxMessagesInterceptor : SaveChangesIntercept
 
         var outboxMessages = dbContext.ChangeTracker
             .Entries()
-            .Where(x => 
+            .Where(x =>
                 x is { Entity: Scan, State: EntityState.Added })
-            .Select(x => new OutboxMessage
+            .Select(x =>
             {
-                Id = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                Type = $"{x.Entity.GetType().Name}Changed",
-                Message = JsonConvert.SerializeObject(x.Entity, new JsonSerializerSettings
+                var scan = (Scan)x.Entity;
+
+                return new OutboxMessage
                 {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                })
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    Type = nameof(ScanRequestMessage),
+                    Message = JsonConvert.SerializeObject(scan.ToMessage(), new JsonSerializerSettings
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    })
+                };
             })
             .ToList();
 

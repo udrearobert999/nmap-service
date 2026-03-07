@@ -1,5 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using NetworkMapper.Contracts.Scans.Messages;
+using NetworkMapper.Infrastructure.Worker.Consumers;
+using NetworkMapper.Infrastructure.Worker.Options;
 
 namespace NetworkMapper.Infrastructure.Worker;
 
@@ -7,6 +12,28 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<KafkaOptions>()
+            .Bind(configuration.GetSection(KafkaOptions.SectionName));
+
+        services.AddMassTransit(x =>
+        {
+            x.UsingInMemory();
+            x.AddRider(rider =>
+            {
+                rider.AddConsumer<ScanRequestConsumer>();
+                rider.UsingKafka((context, k) =>
+                {
+                    var options = context.GetRequiredService<IOptions<KafkaOptions>>().Value;
+
+                    k.Host(options.BootstrapServers);
+                    k.TopicEndpoint<ScanRequestMessage>(
+                        options.ScanRequestsTopic,
+                        options.ScanRequestsConsumerGroup,
+                        e => { e.ConfigureConsumer<ScanRequestConsumer>(context); });
+                });
+            });
+        });
+
         return services;
     }
 }

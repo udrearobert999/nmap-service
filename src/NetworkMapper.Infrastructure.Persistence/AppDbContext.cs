@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     }
 
     public required DbSet<Scan> Scans { get; set; }
+    public required DbSet<ScanResult> ScansResults { get; set; }
     public required DbSet<IdempotentRequest> IdempotentRequests { get; set; }
     public required DbSet<OutboxMessage> OutboxMessages { get; set; }
     

@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using NetworkMapper.Domain.Entities;
 using NetworkMapper.Domain.Entities.Abstractions;
 
 namespace NetworkMapper.Domain.Abstractions;

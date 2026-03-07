@@ -2,8 +2,9 @@
   postgres:
     image: postgres:16-alpine
     container_name: network_mapper_db
+    restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -16,58 +17,95 @@
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: network_mapper_zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: network_mapper_kafka
-    depends_on:
-      - zookeeper
+    restart: unless-stopped
     ports:
       - "9094:9094"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,OUTSIDE://localhost:9094
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      CLUSTER_ID: '206C-BQoTKGsqf42xtoALQ'
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,OUTSIDE://0.0.0.0:9094'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092,OUTSIDE://localhost:9094'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 > /dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: network_mapper_kafka_init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: >
+      bash -c "
+        echo 'Creating Kafka topics...' &&
+        kafka-topics --create --if-not-exists --topic ${KAFKA_SCAN_REQUESTS_TOPIC} --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
+        echo 'Topics created successfully!'
+      "
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8081:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
 
   api:
     build:
       context: .
       dockerfile: src/NetworkMapper.WebAPI/Dockerfile
     container_name: network_mapper_api
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
-      - Kafka__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      ConnectionStrings__DefaultConnection: ${DB_CONNECTION_STRING}
+      Kafka__BootstrapServers: ${KAFKA_BOOTSTRAP_SERVERS}
+      Kafka__ScanRequestsTopic: ${KAFKA_SCAN_REQUESTS_TOPIC}
+      Kafka__ConsumerGroupId: ${KAFKA_SCAN_REQUESTS_CONSUMER_GROUP}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
     depends_on:
       postgres:
         condition: service_healthy
-      kafka:
-        condition: service_started
+      kafka-init:
+        condition: service_completed_successfully
 
   worker:
     build:
       context: .
       dockerfile: src/NetworkMapper.Worker/Dockerfile
     container_name: network_mapper_worker
+    restart: unless-stopped
     environment:
-      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
-      - Kafka__BootstrapServers=${KAFKA_BOOTSTRAP_SERVERS}
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      ConnectionStrings__DefaultConnection: ${DB_CONNECTION_STRING}
+      Kafka__BootstrapServers: ${KAFKA_BOOTSTRAP_SERVERS}
+      Kafka__ScanRequestsTopic: ${KAFKA_SCAN_REQUESTS_TOPIC}
+      Kafka__ScanRequestsConsumerGroup: ${KAFKA_SCAN_REQUESTS_CONSUMER_GROUP}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
     depends_on:
       postgres:
         condition: service_healthy
-      kafka:
-        condition: service_started
+      kafka-init:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:
+  kafka_data:

@@ -17,7 +17,7 @@ namespace NetworkMapper.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.3")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -25,6 +25,7 @@ namespace NetworkMapper.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("NetworkMapper.Domain.Entities.IdempotentRequest", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -42,6 +43,7 @@ namespace NetworkMapper.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("NetworkMapper.Domain.Entities.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -66,16 +68,23 @@ namespace NetworkMapper.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProcessedAt")
                         .HasFilter("\"ProcessedAt\" IS NULL");
 
-                    b.ToTable("OutboxMessages");
+                    b.ToTable("OutboxMessages", (string)null);
                 });
 
             modelBuilder.Entity("NetworkMapper.Domain.Entities.Scan", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("RequestId")
                         .HasColumnType("uuid");
@@ -94,6 +103,53 @@ namespace NetworkMapper.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Scans", (string)null);
+                });
+
+            modelBuilder.Entity("NetworkMapper.Domain.Entities.ScanResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Protocol")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ScanId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Service")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScanId");
+
+                    b.ToTable("ScansResults", (string)null);
+                });
+
+            modelBuilder.Entity("NetworkMapper.Domain.Entities.ScanResult", b =>
+                {
+                    b.HasOne("NetworkMapper.Domain.Entities.Scan", "Scan")
+                        .WithMany("Results")
+                        .HasForeignKey("ScanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Scan");
+                });
+
+            modelBuilder.Entity("NetworkMapper.Domain.Entities.Scan", b =>
+                {
+                    b.Navigation("Results");
                 });
 #pragma warning restore 612, 618
         }

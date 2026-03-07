@@ -8,14 +8,16 @@ namespace NetworkMapper.Infrastructure.Persistence;
 internal class UnitOfWork : IUnitOfWork
 {
     private readonly DbContext _dbContext;
-    public IRepository<Scan, Guid> Scans { get; set; }
+    public IScanRepository Scans { get; set; }
     public IRepository<IdempotentRequest, Guid> IdempotentRequests { get; set; }
+    public IRepository<ScanResult, Guid> ScansResults { get; set; }
 
     public UnitOfWork(DbContext dbContext)
     {
         _dbContext = dbContext;
 
-        Scans = new Repository<Scan, Guid>(dbContext);
+        Scans = new ScanRepository(dbContext);
+        ScansResults = new Repository<ScanResult, Guid>(dbContext);
         IdempotentRequests = new Repository<IdempotentRequest, Guid>(dbContext);
     }
 

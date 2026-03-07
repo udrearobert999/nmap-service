@@ -4,7 +4,8 @@ namespace NetworkMapper.Domain.Abstractions;
 
 public interface IUnitOfWork
 {
-    public IRepository<Scan, Guid> Scans { get; set; }
+    public IScanRepository Scans { get; set; }
     public IRepository<IdempotentRequest, Guid> IdempotentRequests { get; set; }
+    public IRepository<ScanResult, Guid> ScansResults { get; set; }
     public Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

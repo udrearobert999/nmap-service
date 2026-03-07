@@ -1,7 +1,10 @@
 ﻿FROM mcr.microsoft.com/dotnet/runtime:10.0 AS base
 USER root
 
-RUN apt-get update && apt-get install -y nmap && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgssapi-krb5-2 \
+    nmap \
+    && rm -rf /var/lib/apt/lists/*
 USER app
 WORKDIR /app
 
@@ -28,4 +31,6 @@ RUN dotnet publish "./NetworkMapper.Worker.csproj" -c $BUILD_CONFIGURATION -o /a
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+USER app
 ENTRYPOINT ["dotnet", "NetworkMapper.Worker.dll"]

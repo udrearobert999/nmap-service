@@ -32,4 +32,15 @@ internal class Repository<TEntity, TKey> : ReadOnlyRepository<TEntity, TKey>, IR
 
         return Task.CompletedTask;
     }
+
+    public async Task<IReadOnlyCollection<TEntity>> AddRangeAsync(
+        IEnumerable<TEntity> entities,
+        CancellationToken cancellationToken)
+    {
+        var entityList = entities.ToList();
+
+        await _dbSet.AddRangeAsync(entityList, cancellationToken);
+
+        return entityList;
+    }
 }

@@ -12,24 +12,17 @@ internal sealed class ScanConfiguration : IEntityTypeConfiguration<Scan>
         builder.ToTable(TableNamesConstants.Scans);
 
         builder.HasKey(x => x.Id);
-        
-        builder.HasIndex(s => s.RequestId)
-            .IsUnique();
 
-        builder.Property(x => x.Id)
+        builder.Property(x => x.Id).IsRequired()
             .IsRequired()
-            .ValueGeneratedNever();
+            .ValueGeneratedOnAdd();
 
-        builder
-            .Property(x => x.Target)
-            .IsRequired();
-        
-        builder
-            .Property(x => x.Status)
-            .IsRequired();
-        
-        builder
-            .Property(x => x.CreatedAt)
-            .IsRequired();
+        builder.HasIndex(s => s.RequestId).IsUnique();
+
+        builder.Property(x => x.Target).IsRequired();
+        builder.Property(x => x.Status).IsRequired();
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.CompletedAt).IsRequired(false);
+        builder.Property(x => x.ErrorMessage).IsRequired(false);
     }
 }

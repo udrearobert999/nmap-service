@@ -1,4 +1,3 @@
-using NetworkMapper.Worker;
 using NetworkMapper.Application.Worker;
 using NetworkMapper.Infrastructure.Persistence;
 using NetworkMapper.Infrastructure.Worker;
@@ -11,8 +10,6 @@ builder.Services
     .AddApplication(configuration)
     .AddPersistence(configuration)
     .AddInfrastructure(configuration);
-
-builder.Services.AddHostedService<Worker>();
 
 builder.Services.AddSerilog((services, loggerConfiguration) => {
     loggerConfiguration.ReadFrom.Configuration(builder.Configuration);

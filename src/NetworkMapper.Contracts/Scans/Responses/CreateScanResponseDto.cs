@@ -4,4 +4,5 @@ public record CreateScanResponseDto(
     Guid Id, 
     string Target, 
     string Status, 
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    DateTime? CompletedAt);
