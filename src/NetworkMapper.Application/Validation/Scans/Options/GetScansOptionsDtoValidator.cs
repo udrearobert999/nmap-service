@@ -4,10 +4,10 @@ using NetworkMapper.Domain.Entities;
 
 namespace NetworkMapper.Application.Validation.Scans.Options;
 
-public class GetAllScansOptionsDtoValidator :
-    BaseGetCollectionOptionsDtoValidator<GetAllScansOptionsDto, Scan>
+public class GetScansOptionsDtoValidator :
+    BaseGetCollectionOptionsDtoValidator<GetScansOptionsDto, Scan>
 {
-    public GetAllScansOptionsDtoValidator()
+    public GetScansOptionsDtoValidator()
     {
     }
 }

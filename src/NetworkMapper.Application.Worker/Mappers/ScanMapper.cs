@@ -1,6 +1,5 @@
 using NetworkMapper.Contracts.Scans;
 using NetworkMapper.Contracts.Scans.Messages;
-using NetworkMapper.Domain.Entities;
 
 namespace NetworkMapper.Application.Worker.Mappers;
 

@@ -2,7 +2,7 @@
 
 namespace NetworkMapper.Contracts.Scans.Options;
 
-public record GetAllScansOptionsDto(
+public record GetScansOptionsDto(
     string? Target,
     int? Page,
     int? PageSize,

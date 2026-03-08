@@ -9,11 +9,10 @@ internal static class OutputCacheExtensions
 {
     public static OutputCacheOptions ConfigureCustomPolicies(this OutputCacheOptions options)
     {
-        options.AddBasePolicy(policy => policy.Cache());
         options.AddPolicy(CacheConstants.Policies.Scans, policy =>
             policy.Cache()
                 .Expire(TimeSpan.FromMinutes(1))
-                .SetVaryByQueryByTypeProperties<GetAllScansOptionsDto>()
+                .SetVaryByQueryByTypeProperties<GetScansOptionsDto>()
                 .Tag(CacheConstants.Keys.Scans));
 
         return options;

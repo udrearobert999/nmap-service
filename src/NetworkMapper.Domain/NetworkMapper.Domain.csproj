@@ -7,4 +7,8 @@
     <RootNamespace>NetworkMapper.Domain</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NetworkMapper.Contracts\NetworkMapper.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

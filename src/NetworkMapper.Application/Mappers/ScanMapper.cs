@@ -1,5 +1,5 @@
 using NetworkMapper.Contracts.Scans;
-using NetworkMapper.Contracts.Scans.Messages;
+using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Contracts.Scans.Requests;
 using NetworkMapper.Contracts.Scans.Responses;
 using NetworkMapper.Domain.Entities;
@@ -8,11 +8,30 @@ namespace NetworkMapper.Application.Mappers;
 
 public static class ScanMapper
 {
+    public static ScanResultDto ToDto(this ScanResult result) =>
+        new(result.Port, result.Protocol, result.Service, result.State);
+
     public static ScanDto ToDto(this Scan scan) =>
-        new(scan.Id, scan.Target, scan.Status, scan.CreatedAt, scan.CompletedAt);
+        new(
+            scan.Id,
+            scan.Target,
+            scan.Status,
+            scan.CreatedAt,
+            scan.CompletedAt,
+            scan.ErrorMessage,
+            scan.Results.Select(r => r.ToDto()).ToList()
+        );
 
     public static GetScanResponseDto ToGetResponse(this Scan scan) =>
-        new(scan.Id, scan.Target, scan.Status, scan.CreatedAt, scan.CompletedAt);
+        new(
+            scan.Id,
+            scan.Target,
+            scan.Status,
+            scan.CreatedAt,
+            scan.CompletedAt,
+            scan.ErrorMessage,
+            scan.Results.Select(r => r.ToDto()).ToList()
+        );
 
     public static CreateScanResponseDto ToCreateResponse(this Scan scan) =>
         new(scan.Id, scan.Target, scan.Status, scan.CreatedAt, scan.CompletedAt);
@@ -37,12 +56,15 @@ public static class ScanMapper
         Status = "Pending",
         CreatedAt = DateTime.UtcNow
     };
-    
-    public static GetAllScansResponseDto ToGetAllResponse(this IEnumerable<Scan> scans, int totalCount)
+
+    public static GetScansResponseDto ToGetResponse(this IEnumerable<Scan> scans, int totalCount)
     {
-        return new GetAllScansResponseDto(
+        return new GetScansResponseDto(
             scans.Select(s => s.ToDto()).ToList(),
             totalCount
         );
     }
+
+    public static GetScansDiffRequestDto ToRequest(this GetScansDiffOptions options, string target) =>
+        new(target, options.From, options.To);
 }

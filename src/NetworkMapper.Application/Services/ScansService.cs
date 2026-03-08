@@ -1,6 +1,5 @@
 ﻿using NetworkMapper.Application.Mappers;
 using NetworkMapper.Application.Services.Abstractions;
-using NetworkMapper.Application.Specifications;
 using NetworkMapper.Application.Validation;
 using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Contracts.Scans.Requests;
@@ -10,7 +9,7 @@ using NetworkMapper.Domain.Results.Generics;
 
 namespace NetworkMapper.Application.Services;
 
-internal class ScansService : IScansService
+internal sealed class ScansService : IScansService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidationOrchestrator _validationOrchestrator;
@@ -32,7 +31,7 @@ internal class ScansService : IScansService
         {
             return Result<CreateScanResponseDto>.ValidationFailure(validationResult.Error);
         }
-        
+
         var alreadyProcessed = await _unitOfWork.IdempotentRequests
             .ExistsAsync(r => r.Id == request.RequestId, cancellationToken);
 
@@ -58,31 +57,29 @@ internal class ScansService : IScansService
         return Result<CreateScanResponseDto>.Success(scan.ToCreateResponse());
     }
 
-    public async Task<Result<GetAllScansResponseDto>> GetAllPaginatedAsync(
-        GetAllScansOptionsDto options,
+    public async Task<Result<GetScansResponseDto>> GetAllAsync(
+        GetScansOptionsDto options,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validationOrchestrator.ValidateAsync(options, cancellationToken);
         if (validationResult.IsFailure)
         {
-            return Result<GetAllScansResponseDto>.ValidationFailure(validationResult.Error);
+            return Result<GetScansResponseDto>.ValidationFailure(validationResult.Error);
         }
 
-        var getScansSpec = new GetAllScansWithResultsPagedSpec(options);
-        var scans = await _unitOfWork.Scans.GetBySpecAsync(getScansSpec, cancellationToken);
-        
+        var scans = await _unitOfWork.Scans.GetScansAsync(options, cancellationToken);
         var scansCount = await _unitOfWork.Scans.CountAsync(
             s => options.Target == null || s.Target.Contains(options.Target),
             cancellationToken);
 
-        return Result<GetAllScansResponseDto>.Success(scans.ToGetAllResponse(scansCount));
+        return Result<GetScansResponseDto>.Success(scans.ToGetResponse(scansCount));
     }
 
     public async Task<Result<GetScanResponseDto>> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        var scan = await _unitOfWork.Scans.GetByIdAsync(id, cancellationToken, track: false);
+        var scan = await _unitOfWork.Scans.GetScanWithResultsByIdAsync(id, cancellationToken);
 
         if (scan is null)
         {

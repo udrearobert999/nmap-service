@@ -1,6 +1,6 @@
 namespace NetworkMapper.Contracts.Scans.Requests;
 
 public record GetScansDiffRequestDto(
-    string Target, 
-    string From, 
-    string To);
+    string Target,
+    Guid? From,
+    Guid? To);

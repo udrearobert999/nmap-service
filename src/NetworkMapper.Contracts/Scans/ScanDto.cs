@@ -5,4 +5,6 @@ public record ScanDto(
     string Target, 
     string Status, 
     DateTime CreatedAt,
-    DateTime? CompletedAt);
+    DateTime? CompletedAt,
+    string? ErrorMessage,
+    IEnumerable<ScanResultDto> Results);

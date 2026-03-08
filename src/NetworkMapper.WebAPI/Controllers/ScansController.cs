@@ -12,18 +12,22 @@ namespace NetworkMapper.WebAPI.Controllers;
 public class ScansController : BaseController
 {
     private readonly IScansService _scansService;
+    private readonly IScansDiffService _scansDiffService;
     private readonly IOutputCacheStore _outputCacheStore;
 
-    public ScansController(IScansService scansService, IOutputCacheStore outputCacheStore)
+    public ScansController(IScansService scansService, IOutputCacheStore outputCacheStore,
+        IScansDiffService scansDiffService)
     {
         _scansService = scansService;
         _outputCacheStore = outputCacheStore;
+        _scansDiffService = scansDiffService;
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] CreateScanRequestDto requestDto,
-        [FromHeader(Name = "X-Idempotency-Key")] Guid idempotencyKey,
+        [FromHeader(Name = "X-Idempotency-Key")]
+        Guid idempotencyKey,
         CancellationToken cancellationToken)
     {
         var idempotentRequest = requestDto.ToIdempotentRequest(idempotencyKey);
@@ -34,13 +38,11 @@ public class ScansController : BaseController
 
         await _outputCacheStore.EvictByTagAsync(CacheConstants.Keys.Scans, cancellationToken);
 
-        var scan = result.Value;
-
-        return CreatedAtAction(nameof(GetById), new { id = scan.Id }, scan);
+        return NoContent();
     }
-    
+
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById([FromRoute]Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await _scansService.GetByIdAsync(id, cancellationToken);
 
@@ -49,25 +51,25 @@ public class ScansController : BaseController
 
     [HttpGet]
     [OutputCache(PolicyName = CacheConstants.Policies.Scans)]
-    [ProducesResponseType(typeof(GetAllScansResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll([FromQuery] GetAllScansOptionsDto options,
+    [ProducesResponseType(typeof(GetScansResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll([FromQuery] GetScansOptionsDto options,
         CancellationToken cancellationToken)
     {
-        var result = await _scansService.GetAllPaginatedAsync(options, cancellationToken);
+        var result = await _scansService.GetAllAsync(options, cancellationToken);
 
         return result.IsFailure ? HandleFailure(result) : Ok(result.Value);
     }
-    
+
     [HttpGet("diff/{target}")]
-    [OutputCache(PolicyName = CacheConstants.Policies.Scans)]
     [ProducesResponseType(typeof(GetScansDiffResponseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDiff(
-        [FromRoute] string target, 
-        [FromQuery] string from, 
-        [FromQuery] string to,
+        [FromRoute] string target,
+        [FromQuery] GetScansDiffOptions diffOptions,
         CancellationToken cancellationToken)
     {
-        var request = new GetScansDiffRequestDto(target, from, to);
-        return Ok(request);
+        var diffRequest = diffOptions.ToRequest(target);
+        var result = await _scansDiffService.GetDiffAsync(diffRequest, cancellationToken);
+
+        return result.IsFailure ? HandleFailure(result) : Ok(result.Value);
     }
 }
