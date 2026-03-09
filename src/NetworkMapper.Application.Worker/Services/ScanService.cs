@@ -79,6 +79,6 @@ internal sealed class ScanService : IScanService
     private async Task FailScanAsync(Guid scanId, Exception ex)
     {
         _logger.LogError(ex, "Scan {scanId} failed to complete.", scanId);
-        await _unitOfWork.Scans.MarkAsFailedAsync(scanId, CancellationToken.None);
+        await _unitOfWork.Scans.MarkAsFailedAsync(scanId, ex.Message, CancellationToken.None);
     }
 }

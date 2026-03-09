@@ -22,11 +22,14 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
         return rowsAffected > 0;
     }
 
-    public async Task MarkAsFailedAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task MarkAsFailedAsync(Guid id, string errorMessage, CancellationToken cancellationToken = default)
     {
         await _dbSet
             .Where(s => s.Id == id)
-            .ExecuteUpdateAsync(s => s.SetProperty(x => x.Status, "Failed"), cancellationToken);
+            .ExecuteUpdateAsync(s => s
+                    .SetProperty(x => x.Status, "Failed")
+                    .SetProperty(x => x.ErrorMessage, errorMessage),
+                cancellationToken);
     }
 
     public async Task MarkAsCompletedAsync(Guid id, CancellationToken cancellationToken = default)

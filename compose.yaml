@@ -99,6 +99,7 @@
       Kafka__BootstrapServers: ${KAFKA_BOOTSTRAP_SERVERS}
       Kafka__ScanRequestsTopic: ${KAFKA_SCAN_REQUESTS_TOPIC}
       Kafka__ScanRequestsConsumerGroup: ${KAFKA_SCAN_REQUESTS_CONSUMER_GROUP}
+      Nmap__TimeoutSeconds: ${NMAP_TIMEOUT_SECONDS}
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
     depends_on:
       postgres:
