@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.Extensions.Logging;
 using NetworkMapper.Application.Worker.Parsers.Abstractions;
 using NetworkMapper.Application.Worker.Runners.Abstractions;
@@ -38,51 +39,59 @@ internal sealed class ScansService : IScansService
         await TryPerformScanAsync(scanDto, cancellationToken);
     }
 
-    private async Task TryPerformScanAsync(NmapScanDto scanDto, CancellationToken cancellationToken = default)
+    private async Task TryPerformScanAsync(
+        NmapScanDto scanDto,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            var scanInfo = await _unitOfWork.Scans.GetByIdAsync(scanDto.Id, cancellationToken, track: false);
-            if (scanInfo is null) return;
-            
-            var results = await GetResultsAsync(scanInfo.Target, scanDto.Id, cancellationToken);
-            
-            //TODO: Begin transaction
-            await SaveResultsAsync(results, cancellationToken);
-            await CompleteScanAsync(scanDto.Id, cancellationToken);
-            
-            //TODO: End transaction
+            var results = await GetResultsAsync(scanDto, cancellationToken);
+            await TryCompleteScanAsync(scanDto.Id, results, cancellationToken);
+
+            _logger.LogInformation("Scan {ScanId} completed successfully.", scanDto.Id);
         }
         catch (Exception ex)
         {
-            await FailScanAsync(scanDto.Id, ex);
+            await HandleScanFailureAsync(scanDto.Id, ex);
         }
     }
 
-    private async Task<IList<ScanResult>> GetResultsAsync(string target, Guid scanId,
+    private async Task TryCompleteScanAsync(
+        Guid scanId,
+        IEnumerable<ScanResult> results,
         CancellationToken cancellationToken)
     {
-        var xmlOutput = await _runner.RunScanAsync(target, cancellationToken);
-        var scanResults = _parser.Parse(xmlOutput, scanId);
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(
+                IsolationLevel.ReadCommitted,
+                cancellationToken);
+
+            await _unitOfWork.ScansResults.AddRangeAsync(results, cancellationToken);
+            await _unitOfWork.Scans.MarkAsCompletedAsync(scanId, cancellationToken);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch
+        {
+            await _unitOfWork.RollbackTransactionAsync(CancellationToken.None);
+            throw;
+        }
+    }
+
+    private async Task HandleScanFailureAsync(Guid scanId, Exception ex)
+    {
+        _logger.LogError(ex, "Scan {ScanId} failed to complete.", scanId);
+        await _unitOfWork.Scans.MarkAsFailedAsync(scanId, ex.Message, CancellationToken.None);
+    }
+
+    private async Task<IList<ScanResult>> GetResultsAsync(NmapScanDto scanDto,
+        CancellationToken cancellationToken)
+    {
+        var xmlOutput = await _runner.RunScanAsync(scanDto.Target, cancellationToken);
+        var scanResults = _parser.Parse(xmlOutput, scanDto.Id);
 
         return scanResults;
-    }
-
-    private async Task SaveResultsAsync(IList<ScanResult> results, CancellationToken cancellationToken)
-    {
-        await _unitOfWork.ScansResults.AddRangeAsync(results, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-    }
-
-    private async Task CompleteScanAsync(Guid scanId, CancellationToken cancellationToken)
-    {
-        await _unitOfWork.Scans.MarkAsCompletedAsync(scanId, cancellationToken);
-        _logger.LogInformation("Scan {scanId} completed successfully.", scanId);
-    }
-
-    private async Task FailScanAsync(Guid scanId, Exception ex)
-    {
-        _logger.LogError(ex, "Scan {scanId} failed to complete.", scanId);
-        await _unitOfWork.Scans.MarkAsFailedAsync(scanId, ex.Message, CancellationToken.None);
     }
 }
