@@ -6,7 +6,7 @@ namespace NetworkMapper.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BaseController : ControllerBase
+public class ApiControllerBase : ControllerBase
 {
     protected IActionResult HandleFailure(Result result)
     {

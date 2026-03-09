@@ -8,14 +8,14 @@ namespace NetworkMapper.Infrastructure.Worker.Consumers;
 
 internal sealed class ScanRequestConsumer : IConsumer<ScanRequestMessage>
 {
-    private readonly IScanService _scanService;
+    private readonly IScansService _scansService;
     private readonly ILogger<ScanRequestConsumer> _logger;
 
     public ScanRequestConsumer(
-        IScanService scanService, 
+        IScansService scansService, 
         ILogger<ScanRequestConsumer> logger)
     {
-        _scanService = scanService;
+        _scansService = scansService;
         _logger = logger;
     }
 
@@ -28,6 +28,6 @@ internal sealed class ScanRequestConsumer : IConsumer<ScanRequestMessage>
             message.ScanId, message.Target);
 
         var scanDto = message.ToDto();
-        await _scanService.PerformScanAsync(scanDto, context.CancellationToken);
+        await _scansService.PerformScanAsync(scanDto, context.CancellationToken);
     }
 }

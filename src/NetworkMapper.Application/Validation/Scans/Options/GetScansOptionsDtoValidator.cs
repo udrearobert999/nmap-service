@@ -1,4 +1,5 @@
-﻿using NetworkMapper.Application.Validation.Shared;
+﻿using NetworkMapper.Application.Validation.Abstractions;
+using NetworkMapper.Application.Validation.Shared;
 using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Domain.Entities;
 

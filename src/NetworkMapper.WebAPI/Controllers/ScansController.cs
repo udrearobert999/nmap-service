@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using NetworkMapper.Application.Mappers;
 using NetworkMapper.Application.Services.Abstractions;
@@ -9,13 +10,16 @@ using NetworkMapper.WebAPI.Caching.Constants;
 
 namespace NetworkMapper.WebAPI.Controllers;
 
-public class ScansController : BaseController
+[Authorize]
+public class ScansController : ApiControllerBase
 {
     private readonly IScansService _scansService;
     private readonly IScansDiffService _scansDiffService;
     private readonly IOutputCacheStore _outputCacheStore;
 
-    public ScansController(IScansService scansService, IOutputCacheStore outputCacheStore,
+    public ScansController(
+        IScansService scansService,
+        IOutputCacheStore outputCacheStore,
         IScansDiffService scansDiffService)
     {
         _scansService = scansService;
@@ -24,6 +28,9 @@ public class ScansController : BaseController
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create(
         [FromBody] CreateScanRequestDto requestDto,
         [FromHeader(Name = "X-Idempotency-Key")]
@@ -38,10 +45,13 @@ public class ScansController : BaseController
 
         await _outputCacheStore.EvictByTagAsync(CacheConstants.Keys.Scans, cancellationToken);
 
-        return NoContent();
+        return Accepted();
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(GetScanResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await _scansService.GetByIdAsync(id, cancellationToken);
@@ -52,7 +62,10 @@ public class ScansController : BaseController
     [HttpGet]
     [OutputCache(PolicyName = CacheConstants.Policies.Scans)]
     [ProducesResponseType(typeof(GetScansResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll([FromQuery] GetScansOptionsDto options,
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] GetScansOptionsDto options,
         CancellationToken cancellationToken)
     {
         var result = await _scansService.GetAllAsync(options, cancellationToken);
@@ -62,6 +75,8 @@ public class ScansController : BaseController
 
     [HttpGet("diff/{target}")]
     [ProducesResponseType(typeof(GetScansDiffResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetDiff(
         [FromRoute] string target,
         [FromQuery] GetScansDiffOptions diffOptions,

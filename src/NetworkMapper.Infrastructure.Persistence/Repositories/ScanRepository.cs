@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using NetworkMapper.Contracts.Constants;
 using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Domain.Abstractions;
-using NetworkMapper.Domain.Abstractions.Constants;
 using NetworkMapper.Domain.Entities;
 
 namespace NetworkMapper.Infrastructure.Persistence.Repositories;

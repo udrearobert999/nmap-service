@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using NetworkMapper.Application.Shared.Helpers;
 using NetworkMapper.Contracts.Abstractions;
-using NetworkMapper.Domain.Abstractions.Constants;
+using NetworkMapper.Contracts.Constants;
 
-namespace NetworkMapper.Application.Validation.Shared;
+namespace NetworkMapper.Application.Validation.Abstractions;
 
 public class BaseGetCollectionOptionsDtoValidator<TDto, TEntity> : AbstractValidator<TDto>
     where TDto : BaseGetCollectionOptionsDto

@@ -1,4 +1,4 @@
-﻿namespace NetworkMapper.Domain.Abstractions.Constants;
+﻿namespace NetworkMapper.Contracts.Constants;
 
 public static class OrderDirectionConstants
 {

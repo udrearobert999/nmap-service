@@ -2,7 +2,7 @@ using NetworkMapper.Contracts.Scans;
 
 namespace NetworkMapper.Application.Worker.Services.Abstractions;
 
-public interface IScanService
+public interface IScansService
 {
     Task PerformScanAsync(NmapScanDto scanDto, CancellationToken cancellationToken);
 }

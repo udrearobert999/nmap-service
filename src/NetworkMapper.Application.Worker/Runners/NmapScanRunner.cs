@@ -46,6 +46,8 @@ internal sealed class NmapScanRunner : IScanRunner
             UseShellExecute = false,
             CreateNoWindow = true
         };
+        
+        // Handles script injection
         startInfo.ArgumentList.Add("-Pn");
         startInfo.ArgumentList.Add("-oX");
         startInfo.ArgumentList.Add("-");

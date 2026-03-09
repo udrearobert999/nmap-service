@@ -8,18 +8,18 @@ using NetworkMapper.Domain.Entities;
 
 namespace NetworkMapper.Application.Worker.Services;
 
-internal sealed class ScanService : IScanService
+internal sealed class ScansService : IScansService
 {
     private readonly IScanRunner _runner;
     private readonly IScanParser _parser;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<ScanService> _logger;
+    private readonly ILogger<ScansService> _logger;
 
-    public ScanService(
+    public ScansService(
         IScanRunner runner,
         IScanParser parser,
         IUnitOfWork unitOfWork,
-        ILogger<ScanService> logger)
+        ILogger<ScansService> logger)
     {
         _runner = runner;
         _parser = parser;
@@ -44,10 +44,14 @@ internal sealed class ScanService : IScanService
         {
             var scanInfo = await _unitOfWork.Scans.GetByIdAsync(scanDto.Id, cancellationToken, track: false);
             if (scanInfo is null) return;
-
+            
             var results = await GetResultsAsync(scanInfo.Target, scanDto.Id, cancellationToken);
+            
+            //TODO: Begin transaction
             await SaveResultsAsync(results, cancellationToken);
             await CompleteScanAsync(scanDto.Id, cancellationToken);
+            
+            //TODO: End transaction
         }
         catch (Exception ex)
         {

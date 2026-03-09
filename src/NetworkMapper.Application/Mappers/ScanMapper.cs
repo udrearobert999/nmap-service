@@ -1,9 +1,11 @@
 using NetworkMapper.Contracts.Constants;
 using NetworkMapper.Contracts.Scans;
+using NetworkMapper.Contracts.Scans.Messages;
 using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Contracts.Scans.Requests;
 using NetworkMapper.Contracts.Scans.Responses;
 using NetworkMapper.Domain.Entities;
+using Newtonsoft.Json;
 
 namespace NetworkMapper.Application.Mappers;
 
@@ -42,13 +44,6 @@ public static class ScanMapper
         Guid idempotencyKey)
         => new(dto.Target, idempotencyKey);
 
-    public static IdempotentRequest ToIdempotencyRecord(this IdempotentCreateScanRequestDto request) => new()
-    {
-        Id = request.RequestId,
-        Name = nameof(IdempotentCreateScanRequestDto),
-        CreatedAt = DateTime.UtcNow
-    };
-
     public static Scan ToEntity(this IdempotentCreateScanRequestDto dto) => new()
     {
         Id = Guid.NewGuid(),
@@ -56,6 +51,22 @@ public static class ScanMapper
         Target = dto.Target,
         Status = ScanStatus.Pending,
         CreatedAt = DateTime.UtcNow
+    };
+
+    public static ScanRequestMessage ToMessage(this Scan scan)
+        => new(scan.Id, scan.Target);
+
+    public static OutboxMessage ToOutboxMessage(this Scan scan) => new()
+    {
+        Id = Guid.NewGuid(),
+        CreatedAt = DateTime.UtcNow,
+        Type = nameof(ScanRequestMessage),
+        Message = JsonConvert.SerializeObject(
+            scan.ToMessage(),
+            new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            })
     };
 
     public static GetScansResponseDto ToGetResponse(this IEnumerable<Scan> scans, int totalCount)

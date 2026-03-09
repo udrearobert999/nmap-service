@@ -11,12 +11,12 @@ namespace NetworkMapper.Infrastructure.BackgroundJobs;
 
 internal sealed class ProcessOutboxMessagesJob : IJob
 {
-    private readonly AppDbContext _dbContext;
+    private readonly DbContext _dbContext;
     private readonly ITopicProducer<Guid, ScanRequestMessage> _producer;
     private readonly ILogger<ProcessOutboxMessagesJob> _logger;
 
     public ProcessOutboxMessagesJob(
-        AppDbContext dbContext,
+        DbContext dbContext,
         ITopicProducer<Guid, ScanRequestMessage> producer,
         ILogger<ProcessOutboxMessagesJob> logger)
     {
@@ -38,7 +38,7 @@ internal sealed class ProcessOutboxMessagesJob : IJob
 
     private async Task<List<OutboxMessage>> GetUnprocessedMessagesAsync(CancellationToken cancellationToken)
     {
-        return await _dbContext.OutboxMessages
+        return await _dbContext.Set<OutboxMessage>()
             .Where(m => m.ProcessedAt == null)
             .OrderBy(m => m.CreatedAt)
             .Take(20)

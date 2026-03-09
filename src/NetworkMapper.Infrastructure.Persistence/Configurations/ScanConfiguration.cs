@@ -14,10 +14,10 @@ internal sealed class ScanConfiguration : IEntityTypeConfiguration<Scan>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id).IsRequired()
-            .IsRequired()
             .ValueGeneratedOnAdd();
 
-        builder.HasIndex(s => s.RequestId).IsUnique();
+        builder.HasIndex(s => s.RequestId)
+            .IsUnique();
 
         builder.Property(x => x.Target).IsRequired();
         builder.Property(x => x.Status).IsRequired();

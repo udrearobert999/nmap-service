@@ -5,6 +5,7 @@ using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Contracts.Scans.Requests;
 using NetworkMapper.Contracts.Scans.Responses;
 using NetworkMapper.Domain.Abstractions;
+using NetworkMapper.Domain.Entities;
 using NetworkMapper.Domain.Results.Generics;
 
 namespace NetworkMapper.Application.Services;
@@ -32,29 +33,40 @@ internal sealed class ScansService : IScansService
             return Result<CreateScanResponseDto>.ValidationFailure(validationResult.Error);
         }
 
-        var alreadyProcessed = await _unitOfWork.IdempotentRequests
-            .ExistsAsync(r => r.Id == request.RequestId, cancellationToken);
+        var existingScan = await _unitOfWork.Scans
+            .FirstOrDefaultAsync(s => s.RequestId == request.RequestId, cancellationToken);
 
-        if (alreadyProcessed)
+        if (existingScan is not null)
         {
-            var existingScan = await _unitOfWork.Scans
-                .FirstOrDefaultAsync(s => s.RequestId == request.RequestId, cancellationToken);
-
-            if (existingScan is not null)
-            {
-                return Result<CreateScanResponseDto>.Success(existingScan.ToCreateResponse());
-            }
+            return Result<CreateScanResponseDto>.Success(existingScan.ToCreateResponse());
         }
 
         var scan = request.ToEntity();
-        var idempotencyRecord = request.ToIdempotencyRecord();
+        var outboxMessage = scan.ToOutboxMessage();
 
         await _unitOfWork.Scans.CreateAsync(scan, cancellationToken);
-        await _unitOfWork.IdempotentRequests.CreateAsync(idempotencyRecord, cancellationToken);
+        await _unitOfWork.OutboxMessages.CreateAsync(outboxMessage, cancellationToken);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return await ConcurrencySafeSaveAsync(scan, request.RequestId, cancellationToken);
+    }
 
-        return Result<CreateScanResponseDto>.Success(scan.ToCreateResponse());
+    private async Task<Result<CreateScanResponseDto>> ConcurrencySafeSaveAsync(
+        Scan scan,
+        Guid requestId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result<CreateScanResponseDto>.Success(scan.ToCreateResponse());
+        }
+        catch (Exception ex) when (_unitOfWork.IsUniqueConstraintViolation(ex))
+        {
+            var existingScan = await _unitOfWork.Scans
+                .FirstOrDefaultAsync(s => s.RequestId == requestId, cancellationToken);
+
+            return Result<CreateScanResponseDto>.Success(existingScan!.ToCreateResponse());
+        }
     }
 
     public async Task<Result<GetScansResponseDto>> GetAllAsync(
