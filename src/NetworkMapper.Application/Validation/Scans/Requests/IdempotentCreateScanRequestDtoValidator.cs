@@ -12,7 +12,7 @@ public class IdempotentCreateScanRequestDtoValidator : AbstractValidator<Idempot
         RuleFor(x => x.Target)
             .NotEmpty()
             .WithMessage("Target is required!")
-            .Must(TargetValidationHelper.IsValidTarget)
+            .Must(HostValidator.IsValidHost)
             .WithMessage("Target must be a valid IP address or hostname.");
 
         RuleFor(x => x.RequestId)

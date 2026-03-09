@@ -22,12 +22,12 @@ public static class DependencyInjection
             x.AddRider(rider =>
             {
                 using var serviceProvider = services.BuildServiceProvider();
-                var options = serviceProvider.GetRequiredService<IOptions<KafkaOptions>>().Value;
+                var kafkaOptions = serviceProvider.GetRequiredService<IOptions<KafkaOptions>>().Value;
                 
-                rider.AddProducer<ScanRequestMessage>(options.ScanRequestsTopic);
+                rider.AddProducer<Guid, ScanRequestMessage>(kafkaOptions.ScanRequestsTopic);
                 rider.UsingKafka((context, k) =>
                 {
-                    k.Host(options.BootstrapServers);
+                    k.Host(kafkaOptions.BootstrapServers);
                 });
             });
         });

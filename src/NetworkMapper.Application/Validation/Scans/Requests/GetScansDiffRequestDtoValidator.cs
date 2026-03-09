@@ -20,7 +20,7 @@ public sealed class GetScansDiffRequestDtoValidator : AbstractValidator<GetScans
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .WithMessage("Target is required.")
-            .Must(TargetValidationHelper.IsValidTarget)
+            .Must(HostValidator.IsValidHost)
             .WithMessage("Target must be a valid IP address or hostname.")
             .MustAsync(TargetHasCompletedScansAsync)
             .WithMessage("The provided target does not have any completed scans in the database.");

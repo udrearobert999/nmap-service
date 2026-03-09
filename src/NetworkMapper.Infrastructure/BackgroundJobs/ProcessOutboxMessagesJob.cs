@@ -12,12 +12,12 @@ namespace NetworkMapper.Infrastructure.BackgroundJobs;
 internal sealed class ProcessOutboxMessagesJob : IJob
 {
     private readonly AppDbContext _dbContext;
-    private readonly ITopicProducer<ScanRequestMessage> _producer;
+    private readonly ITopicProducer<Guid, ScanRequestMessage> _producer;
     private readonly ILogger<ProcessOutboxMessagesJob> _logger;
 
     public ProcessOutboxMessagesJob(
         AppDbContext dbContext,
-        ITopicProducer<ScanRequestMessage> producer,
+        ITopicProducer<Guid, ScanRequestMessage> producer,
         ILogger<ProcessOutboxMessagesJob> logger)
     {
         _dbContext = dbContext;
@@ -45,7 +45,9 @@ internal sealed class ProcessOutboxMessagesJob : IJob
             .ToListAsync(cancellationToken);
     }
 
-    private async Task ProcessMessagesAsync(List<OutboxMessage> outboxMessages, CancellationToken cancellationToken)
+    private async Task ProcessMessagesAsync(
+        List<OutboxMessage> outboxMessages,
+        CancellationToken cancellationToken)
     {
         foreach (var message in outboxMessages)
         {
@@ -53,7 +55,9 @@ internal sealed class ProcessOutboxMessagesJob : IJob
         }
     }
 
-    private async Task TryProcessSingleMessageAsync(OutboxMessage outboxMessage, CancellationToken cancellationToken)
+    private async Task TryProcessSingleMessageAsync(
+        OutboxMessage outboxMessage,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -65,15 +69,23 @@ internal sealed class ProcessOutboxMessagesJob : IJob
                 return;
             }
 
-            await _producer.Produce(payload, cancellationToken);
+            await _producer.Produce(payload.ScanId, payload, cancellationToken);
 
             outboxMessage.ProcessedAt = DateTime.UtcNow;
-            _logger.LogInformation("Successfully dispatched outbox message {Id} to Kafka.", outboxMessage.Id);
+
+            _logger.LogInformation(
+                "Successfully dispatched outbox message {OutboxMessageId} to Kafka with key {ScanId}.",
+                outboxMessage.Id,
+                payload.ScanId);
         }
         catch (Exception ex)
         {
             outboxMessage.ErrorMessage = ex.Message;
-            _logger.LogError(ex, "Failed to process outbox message {Id}", outboxMessage.Id);
+
+            _logger.LogError(
+                ex,
+                "Failed to process outbox message {OutboxMessageId}",
+                outboxMessage.Id);
         }
     }
 }

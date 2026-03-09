@@ -29,7 +29,16 @@ public static class DependencyInjection
                     k.TopicEndpoint<ScanRequestMessage>(
                         options.ScanRequestsTopic,
                         options.ScanRequestsConsumerGroup,
-                        e => { e.ConfigureConsumer<ScanRequestConsumer>(context); });
+                        e =>
+                        {
+                            e.PrefetchCount = options.ScanRequestsConcurrentMessagesLimit * 2;
+                            e.ConcurrentConsumerLimit = options.ScanRequestsConcurrentConsumerLimit;
+                            e.ConcurrentMessageLimit = options.ScanRequestsConcurrentMessagesLimit;
+                            e.ConcurrentDeliveryLimit = options.ScanRequestsConcurrentMessagesLimit;
+                            e.CheckpointInterval = TimeSpan.FromSeconds(5);
+
+                            e.ConfigureConsumer<ScanRequestConsumer>(context);
+                        });
                 });
             });
         });
