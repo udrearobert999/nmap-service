@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using NetworkMapper.Contracts.Constants;
 using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Domain.Abstractions;
 using NetworkMapper.Domain.Abstractions.Constants;
@@ -16,8 +17,8 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
     public async Task<bool> TryClaimScanAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var rowsAffected = await _dbSet
-            .Where(s => s.Id == id && s.Status == "Pending")
-            .ExecuteUpdateAsync(s => s.SetProperty(x => x.Status, "Running"), cancellationToken);
+            .Where(s => s.Id == id && s.Status == ScanStatus.Pending)
+            .ExecuteUpdateAsync(s => s.SetProperty(x => x.Status, ScanStatus.Running), cancellationToken);
 
         return rowsAffected > 0;
     }
@@ -27,7 +28,7 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
         await _dbSet
             .Where(s => s.Id == id)
             .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.Status, "Failed")
+                    .SetProperty(x => x.Status, ScanStatus.Failed)
                     .SetProperty(x => x.ErrorMessage, errorMessage),
                 cancellationToken);
     }
@@ -37,7 +38,7 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
         await _dbSet
             .Where(s => s.Id == id)
             .ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.Status, "Completed")
+                .SetProperty(x => x.Status, ScanStatus.Completed)
                 .SetProperty(x => x.CompletedAt, DateTime.UtcNow), cancellationToken);
     }
 
@@ -124,7 +125,7 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
         return await _dbSet
             .Include(s => s.Results)
             .AsNoTracking()
-            .Where(s => s.Target == target && s.Status == "Completed")
+            .Where(s => s.Target == target && s.Status == ScanStatus.Completed)
             .OrderByDescending(s => s.CreatedAt)
             .Take(count)
             .ToListAsync(cancellationToken);

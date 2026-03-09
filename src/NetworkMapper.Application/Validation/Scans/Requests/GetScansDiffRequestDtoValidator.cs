@@ -1,5 +1,6 @@
 using FluentValidation;
 using NetworkMapper.Application.Validation.Shared;
+using NetworkMapper.Contracts.Constants;
 using NetworkMapper.Contracts.Scans.Requests;
 using NetworkMapper.Domain.Abstractions;
 using NetworkMapper.Domain.Entities;
@@ -8,8 +9,6 @@ namespace NetworkMapper.Application.Validation.Scans.Requests;
 
 public sealed class GetScansDiffRequestDtoValidator : AbstractValidator<GetScansDiffRequestDto>
 {
-    private const string CompletedStatus = "Completed";
-
     private readonly IUnitOfWork _unitOfWork;
 
     public GetScansDiffRequestDtoValidator(IUnitOfWork unitOfWork)
@@ -129,7 +128,7 @@ public sealed class GetScansDiffRequestDtoValidator : AbstractValidator<GetScans
 
     private static bool IsCompleted(Scan? scan) =>
         scan is not null &&
-        string.Equals(scan.Status, CompletedStatus, StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(scan.Status, ScanStatus.Completed, StringComparison.OrdinalIgnoreCase) &&
         scan.CompletedAt.HasValue;
 
     private static bool BelongsToTarget(Scan? scan, string target) =>

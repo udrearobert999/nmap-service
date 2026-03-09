@@ -1,3 +1,4 @@
+using NetworkMapper.Contracts.Constants;
 using NetworkMapper.Contracts.Scans;
 using NetworkMapper.Contracts.Scans.Options;
 using NetworkMapper.Contracts.Scans.Requests;
@@ -53,7 +54,7 @@ public static class ScanMapper
         Id = Guid.NewGuid(),
         RequestId = dto.RequestId,
         Target = dto.Target,
-        Status = "Pending",
+        Status = ScanStatus.Pending,
         CreatedAt = DateTime.UtcNow
     };
 
