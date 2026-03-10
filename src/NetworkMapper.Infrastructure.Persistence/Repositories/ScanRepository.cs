@@ -102,18 +102,18 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
 
     private static IQueryable<Scan> ApplyPaging(IQueryable<Scan> query, GetScansOptionsDto options)
     {
-        if (!options.Page.HasValue && !options.PageSize.HasValue)
+        if (!options.PageNumber.HasValue && !options.PageSize.HasValue)
         {
             return query;
         }
 
-        if (options.Page is null || options.PageSize is null)
+        if (options.PageNumber is null || options.PageSize is null)
             throw new ArgumentException("Paging enabled but has null values.");
 
-        if (options.Page < 1)
-            throw new ArgumentException("Page number must be greater than or equal to 1.");
+        if (options.PageNumber < 1)
+            throw new ArgumentException("PageNumber number must be greater than or equal to 1.");
 
-        var skip = (options.Page.Value - 1) * options.PageSize.Value;
+        var skip = (options.PageNumber.Value - 1) * options.PageSize.Value;
 
         return query.Skip(skip).Take(options.PageSize.Value);
     }

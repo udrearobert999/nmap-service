@@ -15,7 +15,7 @@ public class BaseGetCollectionOptionsDtoValidator<TDto, TEntity> : AbstractValid
             .InclusiveBetween(1, 25)
             .WithMessage("Page size must be between 1 and 25!");
 
-        RuleFor(x => x.Page)
+        RuleFor(x => x.PageNumber)
             .GreaterThanOrEqualTo(1)
             .WithMessage("Page number must be greater than or equal to 1!");
 
