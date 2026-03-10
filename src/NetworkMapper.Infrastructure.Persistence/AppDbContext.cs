@@ -10,7 +10,7 @@ internal sealed class AppDbContext : DbContext
     }
 
     public required DbSet<Scan> Scans { get; set; }
-    public required DbSet<ScanResult> ScansResults { get; set; }
+    public required DbSet<ScanResult> ScanResults { get; set; }
     public required DbSet<OutboxMessage> OutboxMessages { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>

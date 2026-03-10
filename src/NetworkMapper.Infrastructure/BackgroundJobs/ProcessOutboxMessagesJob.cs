@@ -1,7 +1,9 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NetworkMapper.Contracts.Scans.Messages;
+using NetworkMapper.Domain.Abstractions;
 using NetworkMapper.Domain.Entities;
 using NetworkMapper.Infrastructure.Persistence;
 using Newtonsoft.Json;
@@ -11,52 +13,52 @@ namespace NetworkMapper.Infrastructure.BackgroundJobs;
 
 internal sealed class ProcessOutboxMessagesJob : IJob
 {
-    private readonly DbContext _dbContext;
-    private readonly ITopicProducer<Guid, ScanRequestMessage> _producer;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<ProcessOutboxMessagesJob> _logger;
 
     public ProcessOutboxMessagesJob(
-        DbContext dbContext,
-        ITopicProducer<Guid, ScanRequestMessage> producer,
+        IUnitOfWork unitOfWork,
+        IServiceScopeFactory scopeFactory,
         ILogger<ProcessOutboxMessagesJob> logger)
     {
-        _dbContext = dbContext;
-        _producer = producer;
+        _unitOfWork = unitOfWork;
+        _scopeFactory = scopeFactory;
         _logger = logger;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var outboxMessages = await GetUnprocessedMessagesAsync(context.CancellationToken);
-
+        var outboxMessages = await _unitOfWork.OutboxMessages.ClaimScanAsync(20, context.CancellationToken);
         if (outboxMessages.Count == 0)
             return;
 
-        await ProcessMessagesAsync(outboxMessages, context.CancellationToken);
-        await _dbContext.SaveChangesAsync(context.CancellationToken);
+        await Parallel.ForEachAsync(outboxMessages, GetParallelOptions(context.CancellationToken),
+            async (message, token) =>
+            {
+                await using var scope = _scopeFactory.CreateAsyncScope();
+
+                var scopedUnitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var scopedProducer =
+                    scope.ServiceProvider.GetRequiredService<ITopicProducer<Guid, ScanRequestMessage>>();
+
+                await TryProcessSingleMessageAsync(message, scopedUnitOfWork, scopedProducer, token);
+            });
     }
 
-    private async Task<List<OutboxMessage>> GetUnprocessedMessagesAsync(CancellationToken cancellationToken)
+    private static ParallelOptions GetParallelOptions(CancellationToken cancellationToken)
     {
-        return await _dbContext.Set<OutboxMessage>()
-            .Where(m => m.ProcessedAt == null)
-            .OrderBy(m => m.CreatedAt)
-            .Take(20)
-            .ToListAsync(cancellationToken);
-    }
-
-    private async Task ProcessMessagesAsync(
-        List<OutboxMessage> outboxMessages,
-        CancellationToken cancellationToken)
-    {
-        foreach (var message in outboxMessages)
+        return new ParallelOptions
         {
-            await TryProcessSingleMessageAsync(message, cancellationToken);
-        }
+            MaxDegreeOfParallelism = 5,
+            CancellationToken = cancellationToken
+        };
     }
 
     private async Task TryProcessSingleMessageAsync(
         OutboxMessage outboxMessage,
+        IUnitOfWork scopedUnitOfWork,
+        ITopicProducer<Guid, ScanRequestMessage> scopedProducer,
         CancellationToken cancellationToken)
     {
         try
@@ -65,13 +67,15 @@ internal sealed class ProcessOutboxMessagesJob : IJob
 
             if (payload is null)
             {
-                outboxMessage.ErrorMessage = "Deserialization resulted in null payload.";
+                await scopedUnitOfWork.OutboxMessages.MarkAsFailedAsync(
+                    outboxMessage.Id,
+                    "Deserialization resulted in null payload.",
+                    cancellationToken);
                 return;
             }
 
-            await _producer.Produce(payload.ScanId, payload, cancellationToken);
-
-            outboxMessage.ProcessedAt = DateTime.UtcNow;
+            await scopedProducer.Produce(payload.ScanId, payload, cancellationToken);
+            await scopedUnitOfWork.OutboxMessages.MarkAsCompletedAsync(outboxMessage.Id, cancellationToken);
 
             _logger.LogInformation(
                 "Successfully dispatched outbox message {OutboxMessageId} to Kafka with key {ScanId}.",
@@ -80,8 +84,7 @@ internal sealed class ProcessOutboxMessagesJob : IJob
         }
         catch (Exception ex)
         {
-            outboxMessage.ErrorMessage = ex.Message;
-
+            await scopedUnitOfWork.OutboxMessages.MarkAsFailedAsync(outboxMessage.Id, ex.Message, cancellationToken);
             _logger.LogError(
                 ex,
                 "Failed to process outbox message {OutboxMessageId}",

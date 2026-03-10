@@ -9,7 +9,7 @@ internal sealed class ScanResultConfiguration : IEntityTypeConfiguration<ScanRes
 {
     public void Configure(EntityTypeBuilder<ScanResult> builder)
     {
-        builder.ToTable(TableNamesConstants.ScansResults);
+        builder.ToTable(TableNamesConstants.ScanResults);
 
         builder.HasKey(x => x.Id);
 

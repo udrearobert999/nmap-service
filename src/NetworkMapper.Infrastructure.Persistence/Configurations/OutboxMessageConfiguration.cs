@@ -10,8 +10,10 @@ internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outb
     public void Configure(EntityTypeBuilder<OutboxMessage> builder)
     {
         builder.ToTable(TableNamesConstants.OutboxMessages);
-        
+
         builder.HasKey(x => x.Id);
+
+        builder.HasIndex(x => new { x.Status, x.CreatedAt });
 
         builder.Property(x => x.Id)
             .IsRequired()
@@ -19,11 +21,9 @@ internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outb
 
         builder.Property(x => x.Type).IsRequired();
         builder.Property(x => x.Message).IsRequired();
+        builder.Property(x => x.Status).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.ProcessedAt);
         builder.Property(x => x.ErrorMessage);
-
-        builder.HasIndex(x => x.ProcessedAt)
-            .HasFilter("\"ProcessedAt\" IS NULL");
     }
 }

@@ -22,6 +22,7 @@ public static class MigrationExtensions
                 .CreateLogger("DatabaseMigrations"); 
             
             logger.LogError(ex, "An error occurred while applying the database migrations.");
+            throw;
         }
     }
 }

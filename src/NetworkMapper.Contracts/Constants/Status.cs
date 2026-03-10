@@ -1,6 +1,6 @@
 namespace NetworkMapper.Contracts.Constants;
 
-public static class ScanStatus
+public static class Status
 {
     public const string Pending = "Pending";
     public const string Running = "Running";

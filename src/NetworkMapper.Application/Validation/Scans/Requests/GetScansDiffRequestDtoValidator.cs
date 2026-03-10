@@ -128,7 +128,7 @@ public sealed class GetScansDiffRequestDtoValidator : AbstractValidator<GetScans
 
     private static bool IsCompleted(Scan? scan) =>
         scan is not null &&
-        string.Equals(scan.Status, ScanStatus.Completed, StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(scan.Status, Status.Completed, StringComparison.OrdinalIgnoreCase) &&
         scan.CompletedAt.HasValue;
 
     private static bool BelongsToTarget(Scan? scan, string target) =>

@@ -13,11 +13,11 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
     {
     }
 
-    public async Task<bool> TryClaimScanAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> ClaimScanAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var rowsAffected = await _dbSet
-            .Where(s => s.Id == id && s.Status == ScanStatus.Pending)
-            .ExecuteUpdateAsync(s => s.SetProperty(x => x.Status, ScanStatus.Running), cancellationToken);
+            .Where(s => s.Id == id && s.Status == Status.Pending)
+            .ExecuteUpdateAsync(s => s.SetProperty(x => x.Status, Status.Running), cancellationToken);
 
         return rowsAffected > 0;
     }
@@ -27,7 +27,7 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
         await _dbSet
             .Where(s => s.Id == id)
             .ExecuteUpdateAsync(s => s
-                    .SetProperty(x => x.Status, ScanStatus.Failed)
+                    .SetProperty(x => x.Status, Status.Failed)
                     .SetProperty(x => x.ErrorMessage, errorMessage),
                 cancellationToken);
     }
@@ -37,7 +37,7 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
         await _dbSet
             .Where(s => s.Id == id)
             .ExecuteUpdateAsync(s => s
-                .SetProperty(x => x.Status, ScanStatus.Completed)
+                .SetProperty(x => x.Status, Status.Completed)
                 .SetProperty(x => x.CompletedAt, DateTime.UtcNow), cancellationToken);
     }
 
@@ -124,7 +124,7 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
         return await _dbSet
             .Include(s => s.Results)
             .AsNoTracking()
-            .Where(s => s.Target == target && s.Status == ScanStatus.Completed)
+            .Where(s => s.Target == target && s.Status == Status.Completed)
             .OrderByDescending(s => s.CreatedAt)
             .Take(count)
             .ToListAsync(cancellationToken);

@@ -30,7 +30,7 @@ internal sealed class ScansService : IScansService
 
     public async Task PerformScanAsync(NmapScanDto scanDto, CancellationToken cancellationToken = default)
     {
-        var claimed = await _unitOfWork.Scans.TryClaimScanAsync(scanDto.Id, cancellationToken);
+        var claimed = await _unitOfWork.Scans.ClaimScanAsync(scanDto.Id, cancellationToken);
         if (!claimed)
         {
             return;
@@ -67,7 +67,7 @@ internal sealed class ScansService : IScansService
                 IsolationLevel.ReadCommitted,
                 cancellationToken);
 
-            await _unitOfWork.ScansResults.AddRangeAsync(results, cancellationToken);
+            await _unitOfWork.ScanResults.AddRangeAsync(results, cancellationToken);
             await _unitOfWork.Scans.MarkAsCompletedAsync(scanId, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);

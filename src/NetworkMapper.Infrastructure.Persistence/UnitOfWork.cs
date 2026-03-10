@@ -14,16 +14,16 @@ internal sealed class UnitOfWork : IUnitOfWork, IAsyncDisposable
     private IDbContextTransaction? _transaction;
 
     public IScanRepository Scans { get; set; }
-    public IRepository<OutboxMessage, Guid> OutboxMessages { get; set; }
-    public IRepository<ScanResult, Guid> ScansResults { get; set; }
+    public IOutboxMessageRepository OutboxMessages { get; set; }
+    public IRepository<ScanResult, Guid> ScanResults { get; set; }
 
     public UnitOfWork(DbContext dbContext)
     {
         _dbContext = dbContext;
 
         Scans = new ScanRepository(dbContext);
-        ScansResults = new Repository<ScanResult, Guid>(dbContext);
-        OutboxMessages = new Repository<OutboxMessage, Guid>(dbContext);
+        OutboxMessages = new OutboxMessageRepository(dbContext);
+        ScanResults = new Repository<ScanResult, Guid>(dbContext);
     }
 
     public async Task BeginTransactionAsync(

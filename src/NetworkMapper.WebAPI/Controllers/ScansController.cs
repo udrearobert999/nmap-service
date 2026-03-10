@@ -10,7 +10,7 @@ using NetworkMapper.WebAPI.Caching.Constants;
 
 namespace NetworkMapper.WebAPI.Controllers;
 
-[Authorize]
+// [Authorize]
 public class ScansController : ApiControllerBase
 {
     private readonly IScansService _scansService;

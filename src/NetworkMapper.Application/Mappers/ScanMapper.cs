@@ -49,7 +49,7 @@ public static class ScanMapper
         Id = Guid.NewGuid(),
         RequestId = dto.RequestId,
         Target = dto.Target,
-        Status = ScanStatus.Pending,
+        Status = Status.Pending,
         CreatedAt = DateTime.UtcNow
     };
 
@@ -61,6 +61,7 @@ public static class ScanMapper
         Id = Guid.NewGuid(),
         CreatedAt = DateTime.UtcNow,
         Type = nameof(ScanRequestMessage),
+        Status = Status.Pending,
         Message = JsonConvert.SerializeObject(
             scan.ToMessage(),
             new JsonSerializerSettings
