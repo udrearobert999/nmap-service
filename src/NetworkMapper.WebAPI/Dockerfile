@@ -18,7 +18,8 @@ COPY ["tst/NetworkMapper.WebAPI.Tests/NetworkMapper.WebAPI.Tests.csproj", "tst/N
 RUN dotnet restore "src/NetworkMapper.WebAPI/NetworkMapper.WebAPI.csproj"
 RUN dotnet restore "tst/NetworkMapper.WebAPI.Tests/NetworkMapper.WebAPI.Tests.csproj"
 
-COPY . .
+COPY ["src/", "src/"]
+COPY ["tst/", "tst/"]
 
 RUN dotnet test "tst/NetworkMapper.WebAPI.Tests/NetworkMapper.WebAPI.Tests.csproj" -c $BUILD_CONFIGURATION --no-restore
 

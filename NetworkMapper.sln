@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		compose.yaml = compose.yaml
 		.env = .env
 		concurrency-test.sh = concurrency-test.sh
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Worker.Tests", "tst\NetworkMapper.Worker.Tests\NetworkMapper.Worker.Tests.csproj", "{2585C096-071C-4497-ADA6-11308CACDCC3}"

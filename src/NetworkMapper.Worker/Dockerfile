@@ -23,7 +23,8 @@ COPY ["tst/NetworkMapper.Worker.Tests/NetworkMapper.Worker.Tests.csproj", "tst/N
 RUN dotnet restore "src/NetworkMapper.Worker/NetworkMapper.Worker.csproj"
 RUN dotnet restore "tst/NetworkMapper.Worker.Tests/NetworkMapper.Worker.Tests.csproj"
 
-COPY . .
+COPY ["src/", "src/"]
+COPY ["tst/", "tst/"]
 
 RUN dotnet test "tst/NetworkMapper.Worker.Tests/NetworkMapper.Worker.Tests.csproj" -c $BUILD_CONFIGURATION --no-restore
 
