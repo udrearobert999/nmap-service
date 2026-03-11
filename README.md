@@ -33,8 +33,8 @@ docker compose version
 ## Functionalities
 // TODO
 
-# High Level Design
+## High Level Design
 // TODO
 
-# Patterns Used
+## Patterns Used
 // TODO
