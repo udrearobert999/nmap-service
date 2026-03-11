@@ -94,4 +94,17 @@ The `Domain` layer contains the business entities, the `Application` layer conta
 </p>
 
 ## Other Patterns Used
-// TODO
+
+- **Transactional Outbox Pattern**  
+  The API uses the transactional outbox pattern to guarantee consistency between the database state and the Kafka messages published to the worker.  
+  Instead of writing to the database and Kafka as two separate operations, the application stores both the business data and an outbox record in the same database transaction.  
+  A separate publishing step then reads the pending outbox records and delivers them to Kafka. This avoids the **dual-write problem**, where one operation succeeds and the other fails, leaving the system in an inconsistent state.
+
+  In this project, the pattern ensures that when a scan request is created, the scan is persisted reliably and the corresponding event is eventually published to Kafka for worker processing.
+
+- **Atomic Claim Pattern**  
+  The solution also uses an atomic claim pattern for concurrency-safe database operations.  
+  This pattern is used when multiple processes may attempt to pick the same pending work item at the same time. Instead of reading first and updating later, the application claims work atomically in the database so that a record can only be reserved by one consumer.  
+  This prevents duplicate processing, reduces race conditions, and makes the worker behavior safe even when running concurrently.
+
+  In this project, this pattern is useful for safely claiming pending records that need to be processed or published, ensuring that the same database entry is not handled multiple times by different execution flows.
