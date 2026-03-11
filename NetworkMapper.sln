@@ -30,7 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Worker.Tests", "tst\NetworkMapper.Worker.Tests\NetworkMapper.Worker.Tests.csproj", "{2585C096-071C-4497-ADA6-11308CACDCC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.WebApi.Tests", "tst\NetworkMapper.WebApi.Tests\NetworkMapper.WebApi.Tests.csproj", "{D27E18EC-6E33-4BE2-ADD7-7EECEBB63234}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.WebAPI.Tests", "tst\NetworkMapper.WebAPI.Tests\NetworkMapper.WebAPI.Tests.csproj", "{D27E18EC-6E33-4BE2-ADD7-7EECEBB63234}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

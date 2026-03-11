@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Moq;
 using NetworkMapper.Application.Services;
 using NetworkMapper.Application.Validation;
@@ -5,8 +10,9 @@ using NetworkMapper.Contracts.Scans.Requests;
 using NetworkMapper.Domain.Abstractions;
 using NetworkMapper.Domain.Entities;
 using NetworkMapper.Domain.Results;
+using Xunit;
 
-namespace NetworkMapper.WebApi.Tests.Services;
+namespace NetworkMapper.WebAPI.Tests.Services;
 
 public class ScansDiffServiceTests
 {
