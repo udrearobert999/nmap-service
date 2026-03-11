@@ -19,4 +19,9 @@
       <PackageReference Include="Scrutor" Version="7.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="NetworkMapper.Worker.Tests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    </ItemGroup>
+
 </Project>
