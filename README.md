@@ -8,20 +8,18 @@ The full development environment is containerized with Docker Compose for easy s
 This setup makes it simple to run, test, and extend the application in a consistent way.
 
 ## Approach
-
-The application is designed around separation of responsibilities.  
 The REST API handles client requests and publishes messages to Kafka, while the worker consumes those messages and performs background processing.  
 Both services use the same SQL database to persist and access application data.  
 Docker Compose is used to orchestrate all required services, including the API, worker, database, and Kafka broker.
 
-## Installation
+## Installation and Run
 
 ### Prerequisites
 
 Before running the project, make sure you have the following installed:
 
-- [Docker](https://www.docker.com/)
-- Docker Compose
+- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install)
 
 You can verify the installation with:
 
@@ -30,11 +28,18 @@ docker --version
 docker compose version
 ```
 
+To run the project you will have to go at the root of the repository and run:
+```bash
+docker compose up
+```
+
+After this the app should can be acessible locally at `http://localhost:8080/`. The api documentation should be available at `http://localhost:8080/swagger/index.html`
+The project also contains an UI for Kafka and it is exposed at `http://localhost:8081/`
+
 ## Functionalities
 
-The REST API is responsible for receiving scan requests, exposing scan data, and providing comparison capabilities between scan executions.  
+The REST API is responsible for receiving scan requests, exposing scan data, and providing diff capabilities between scan executions.  
 It stores scan requests in the database, publishes them to Kafka for asynchronous processing by the worker, and exposes endpoints to retrieve and compare scan results.  
-For security, the API uses **Auth0-based authorization** to protect access to its endpoints.
 
 ### Available Endpoints
 
@@ -92,6 +97,9 @@ The `Domain` layer contains the business entities, the `Application` layer conta
 <p align="center">
   <img src="img/CleanArchitecture.png" alt="Clean Architecture used by API and Worker" width="600"/>
 </p>
+
+## Testing
+This project is only covering the `Services` classes with unit tests because they encapuslate the business logic.
 
 ## Other Patterns Used
 
