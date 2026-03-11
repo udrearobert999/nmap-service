@@ -95,6 +95,15 @@ The `Domain` layer contains the business entities, the `Application` layer conta
 
 ## Other Patterns Used
 
+- **Repository Pattern**  
+  The data access layer uses the repository pattern to abstract persistence concerns from the application logic.  
+  This keeps the domain and application layers independent from the specific database implementation and provides a cleaner way to query and persist entities.
+
+- **Unit of Work Pattern**  
+  The solution uses the unit of work pattern to manage database transactions consistently.  
+  It groups multiple data access operations into a single transactional boundary, ensuring that related changes are committed or rolled back together.  
+  This is especially useful when persisting scan data together with outbox records.
+
 - **Transactional Outbox Pattern**  
   The API uses the transactional outbox pattern to guarantee consistency between the database state and the Kafka messages published to the worker.  
   Instead of writing to the database and Kafka as two separate operations, the application stores both the business data and an outbox record in the same database transaction.  
