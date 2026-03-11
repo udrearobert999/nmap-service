@@ -34,6 +34,7 @@ docker compose up
 ```
 
 After this the app should can be acessible locally at `http://localhost:8080/`. The api documentation should be available at `http://localhost:8080/swagger/index.html`
+
 The project also contains an UI for Kafka and it is exposed at `http://localhost:8081/`
 
 ## Functionalities
