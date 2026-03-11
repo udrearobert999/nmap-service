@@ -28,3 +28,13 @@ You can verify the installation with:
 ```bash
 docker --version
 docker compose version
+```
+
+## Functionalities
+// TODO
+
+# High Level Design
+// TODO
+
+# Patterns Used
+// TODO
