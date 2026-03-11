@@ -1,4 +1,4 @@
-# Netowrk Mapper
+# Network Mapper
 
 ## Introduction
 
