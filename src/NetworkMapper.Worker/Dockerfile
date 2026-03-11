@@ -10,7 +10,7 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /
+WORKDIR /app
 
 COPY ["src/NetworkMapper.Worker/NetworkMapper.Worker.csproj", "src/NetworkMapper.Worker/"]
 COPY ["src/NetworkMapper.Application.Worker/NetworkMapper.Application.Worker.csproj", "src/NetworkMapper.Application.Worker/"]
@@ -20,15 +20,18 @@ COPY ["src/NetworkMapper.Domain/NetworkMapper.Domain.csproj", "src/NetworkMapper
 COPY ["src/NetworkMapper.Contracts/NetworkMapper.Contracts.csproj", "src/NetworkMapper.Contracts/"]
 COPY ["tst/NetworkMapper.Worker.Tests/NetworkMapper.Worker.Tests.csproj", "tst/NetworkMapper.Worker.Tests/"]
 
-RUN dotnet restore "src/NetworkMapper.Worker/NetworkMapper.Worker.csproj"
-RUN dotnet restore "tst/NetworkMapper.Worker.Tests/NetworkMapper.Worker.Tests.csproj"
-
 COPY ["src/", "src/"]
 COPY ["tst/", "tst/"]
 
+RUN find src/ tst/ -name "bin*" -type d -exec rm -rf {} + && \
+    find src/ tst/ -name "obj*" -type d -exec rm -rf {} +
+
+RUN dotnet restore "src/NetworkMapper.Worker/NetworkMapper.Worker.csproj"
+RUN dotnet restore "tst/NetworkMapper.Worker.Tests/NetworkMapper.Worker.Tests.csproj"
+
 RUN dotnet test "tst/NetworkMapper.Worker.Tests/NetworkMapper.Worker.Tests.csproj" -c $BUILD_CONFIGURATION --no-restore
 
-WORKDIR "/src/NetworkMapper.Worker"
+WORKDIR "/app/src/NetworkMapper.Worker"
 RUN dotnet build "NetworkMapper.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

@@ -1,11 +1,11 @@
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS base
 USER app
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /
+WORKDIR /app
 
 COPY ["src/NetworkMapper.WebAPI/NetworkMapper.WebAPI.csproj", "src/NetworkMapper.WebAPI/"]
 COPY ["src/NetworkMapper.Application/NetworkMapper.Application.csproj", "src/NetworkMapper.Application/"]
@@ -15,15 +15,19 @@ COPY ["src/NetworkMapper.Domain/NetworkMapper.Domain.csproj", "src/NetworkMapper
 COPY ["src/NetworkMapper.Contracts/NetworkMapper.Contracts.csproj", "src/NetworkMapper.Contracts/"]
 COPY ["tst/NetworkMapper.WebAPI.Tests/NetworkMapper.WebAPI.Tests.csproj", "tst/NetworkMapper.WebAPI.Tests/"]
 
-RUN dotnet restore "src/NetworkMapper.WebAPI/NetworkMapper.WebAPI.csproj"
-RUN dotnet restore "tst/NetworkMapper.WebAPI.Tests/NetworkMapper.WebAPI.Tests.csproj"
-
 COPY ["src/", "src/"]
 COPY ["tst/", "tst/"]
 
+# TODO: Find fix to remove this
+RUN find src/ tst/ -name "bin*" -type d -exec rm -rf {} + && \
+    find src/ tst/ -name "obj*" -type d -exec rm -rf {} +
+
+RUN dotnet restore "src/NetworkMapper.WebAPI/NetworkMapper.WebAPI.csproj"
+RUN dotnet restore "tst/NetworkMapper.WebAPI.Tests/NetworkMapper.WebAPI.Tests.csproj"
+
 RUN dotnet test "tst/NetworkMapper.WebAPI.Tests/NetworkMapper.WebAPI.Tests.csproj" -c $BUILD_CONFIGURATION --no-restore
 
-WORKDIR "/src/NetworkMapper.WebAPI"
+WORKDIR /app/src/NetworkMapper.WebAPI
 RUN dotnet build "NetworkMapper.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
