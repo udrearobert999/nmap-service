@@ -11,10 +11,13 @@ export default defineConfig({
     },
   },
   server: {
+    host: true,
+    port: 5173,
     proxy: {
       // Proxy API calls to the backend so the browser avoids CORS.
+      // In Docker Compose the target is the api service; locally it's :8080.
       '/api': {
-        target: 'http://localhost:8080',
+        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:8080',
         changeOrigin: true,
       },
     },

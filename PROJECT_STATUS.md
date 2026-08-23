@@ -95,8 +95,11 @@ Patterns: Clean Architecture, Repository, Unit of Work, Transactional Outbox
 ## Run
 
 ```bash
-docker compose up            # API :8080 (Swagger /swagger), Kafka UI :8081
-cd src/portal && npm install && npm run dev   # portal :5173 (needs Clerk key)
+docker compose up            # everything: portal, API, workers, Kafka, DB
 ```
+- Portal (UI): http://localhost:5173  (set `VITE_CLERK_PUBLISHABLE_KEY` in `.env`)
+- API + Swagger: http://localhost:8080/swagger
+- Kafka UI: http://localhost:8081
+
 Dev auth without Clerk: send `X-Dev-Subject` + `X-Dev-Org` + `X-Dev-Role`
 (+ `X-Dev-Email`) headers.

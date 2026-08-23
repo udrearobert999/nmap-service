@@ -132,6 +132,20 @@
       kafka-init:
         condition: service_completed_successfully
 
+  portal:
+    build:
+      context: ./src/portal
+      dockerfile: Dockerfile
+    container_name: network_mapper_portal
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_PROXY_TARGET: http://api:8080
+      VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY}
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
   kafka_data:
