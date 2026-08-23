@@ -1,7 +1,7 @@
 ﻿services:
   postgres:
     image: postgres:16-alpine
-    container_name: network_mapper_db
+    container_name: vantage_db
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -19,7 +19,7 @@
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: network_mapper_kafka
+    container_name: vantage_kafka
     restart: unless-stopped
     ports:
       - "9094:9094"
@@ -47,7 +47,7 @@
 
   kafka-init:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: network_mapper_kafka_init
+    container_name: vantage_kafka_init
     depends_on:
       kafka:
         condition: service_healthy
@@ -73,8 +73,8 @@
   api:
     build:
       context: .
-      dockerfile: src/scans/NetworkMapper.WebAPI/Dockerfile
-    container_name: network_mapper_api
+      dockerfile: src/scans/Vantage.WebAPI/Dockerfile
+    container_name: vantage_api
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -94,8 +94,8 @@
   worker:
     build:
       context: .
-      dockerfile: src/scans/NetworkMapper.Worker/Dockerfile
-    container_name: network_mapper_worker
+      dockerfile: src/scans/Vantage.Worker/Dockerfile
+    container_name: vantage_worker
     restart: unless-stopped
     environment:
       ConnectionStrings__DefaultConnection: ${DB_CONNECTION_STRING}
@@ -136,7 +136,7 @@
     build:
       context: ./src/portal
       dockerfile: Dockerfile
-    container_name: network_mapper_portal
+    container_name: vantage_portal
     restart: unless-stopped
     ports:
       - "5173:5173"

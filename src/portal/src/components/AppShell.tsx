@@ -12,7 +12,7 @@ function useTitle(): string {
   const { pathname } = useLocation()
   if (pathname === "/") return "Dashboard"
   if (pathname.startsWith("/scans")) return "Scans"
-  return "Network Security"
+  return "Vantage"
 }
 
 export function AppShell() {

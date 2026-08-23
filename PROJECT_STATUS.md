@@ -1,4 +1,4 @@
-# Project Status — Multi-Tenant Network Security Platform
+# Vantage — Project Status (Multi-Tenant Network Security Platform)
 
 Dissertation platform: security teams scan infrastructure and assess the risk of
 what's found. Scanning and vulnerability risk-assessment are decoupled as
@@ -6,17 +6,17 @@ event-driven microservices (.NET + Go over Kafka), multi-tenant per team.
 
 ## Architecture
 
-- **REST API** (`src/scans/NetworkMapper.WebAPI`, .NET) — the "brain". Owns
+- **REST API** (`src/scans/Vantage.WebAPI`, .NET) — the "brain". Owns
   scans + risk-assessment lifecycle, publishes work via the transactional
   outbox, enforces auth + tenant scoping.
-- **Scan worker** (`src/scans/NetworkMapper.Worker`, .NET) — consumes
+- **Scan worker** (`src/scans/Vantage.Worker`, .NET) — consumes
   `scan-requests-topic`, runs `nmap -sV`, writes results to the shared DB.
 - **vulnintel-service** (`src/vulnerabilities/vulnintel-service`, Go, clean
   architecture) — consumes `scan-risk-assessment-requests-topic`, does
   CPE→CVE matching + scoring, writes status/findings to the shared DB.
 - **Portal** (`src/portal`, React + Vite + shadcn/ui) — dark, monospace
   dashboard UI. Clerk for auth/orgs.
-- **Shared Postgres** `NetworkMapperDb` (one EF Core `AppDbContext`), **Kafka**,
+- **Shared Postgres** `VantageDb` (one EF Core `AppDbContext`), **Kafka**,
   all orchestrated by `compose.yaml`.
 
 Patterns: Clean Architecture, Repository, Unit of Work, Transactional Outbox

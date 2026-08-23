@@ -1,4 +1,4 @@
-# Architecture & Design — Multi-Tenant Network Security Platform
+# Vantage — Architecture & Design (Multi-Tenant Network Security Platform)
 
 A deep reference for **every technology, architectural pattern, system-design
 pattern, and code-level pattern** used in this project, and **why** each was
@@ -61,7 +61,7 @@ as independent, event-driven services.*
 │                     │ ───────────────────────▶ │  (Go)                │
 └─────────────────────┘                          │  CPE→CVE + scoring   │
         │      ▲                                  │  NVD + CISA KEV      │
-        │      │ shared DB (NetworkMapperDb)      └──────────────────────┘
+        │      │ shared DB (VantageDb)      └──────────────────────┘
         ▼      │                                              │
 ┌──────────────────────────────────────────────────────────────────────┐
 │           PostgreSQL  (single EF Core AppDbContext, shared)            │
@@ -181,7 +181,7 @@ independent, so a central coordinator would add coupling for no benefit.
 
 ### 4.3 Polyglot with a shared-database boundary
 
-We deliberately chose a **shared database** (`NetworkMapperDb`, one
+We deliberately chose a **shared database** (`VantageDb`, one
 `AppDbContext`) rather than database-per-service. The Go worker writes the
 `ScanRiskAssessment` status/findings into the same DB the .NET API reads — the
 *exact analogue* of how the .NET scan worker writes scan results back.

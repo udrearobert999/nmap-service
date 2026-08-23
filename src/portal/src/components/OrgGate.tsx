@@ -22,7 +22,7 @@ export function OrgGate({ children }: { children: ReactNode }) {
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
         <div className="flex items-center gap-2 text-lg font-semibold">
           <ShieldCheck className="h-6 w-6 text-primary" />
-          Network Security Portal
+          Vantage
         </div>
         <p className="max-w-md text-center text-sm text-muted-foreground">
           You need an active team (organization) to continue. Select an existing

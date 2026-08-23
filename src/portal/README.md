@@ -1,6 +1,6 @@
-# Network Security Portal
+# Vantage Portal
 
-Web UI ("portal") for the Network Security Platform. Queue nmap scans, watch
+Web UI ("portal") for Vantage, the Multi-Tenant Network Security Platform. Queue nmap scans, watch
 them progress live, inspect results, and request risk assessments — all scoped
 to the **team (organization)** you're signed in to via Clerk.
 

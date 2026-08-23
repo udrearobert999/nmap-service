@@ -1,4 +1,4 @@
-# Network Mapper
+# Vantage
 
 ## Introduction
 

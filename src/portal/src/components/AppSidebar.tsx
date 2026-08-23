@@ -30,7 +30,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-2 px-2 py-1.5">
           <ShieldCheck className="h-5 w-5 text-primary" />
           <span className="text-sm font-semibold tracking-tight">
-            Network Security
+            Vantage
           </span>
         </div>
       </SidebarHeader>
