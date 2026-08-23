@@ -32,7 +32,6 @@ export function ConnectivityIndicator() {
 
   return (
     <div className="flex items-center gap-3" aria-label="Backend connectivity">
-      <Dot label="DB" state={resolve(data ? data.database === "up" : undefined)} />
       <Dot
         label="Scanning"
         state={resolve(data ? data.services.scanning === "up" : undefined)}

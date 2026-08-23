@@ -23,7 +23,7 @@ export function ScanDetailPage() {
   return (
     <div className="space-y-6">
       <Button variant="ghost" size="sm" asChild>
-        <Link to="/">
+        <Link to="/scans">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to scans
         </Link>

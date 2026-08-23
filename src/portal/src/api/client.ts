@@ -18,21 +18,44 @@ interface RequestOptions {
   signal?: AbortSignal
 }
 
+function collectValidationMessages(errors: unknown): string[] {
+  if (!errors) return []
+  if (Array.isArray(errors)) {
+    return errors
+      .map((e) =>
+        e && typeof e === "object"
+          ? (e as { message?: string }).message
+          : typeof e === "string"
+            ? e
+            : undefined,
+      )
+      .filter((m): m is string => Boolean(m))
+  }
+  if (typeof errors === "object") {
+    return Object.values(errors as Record<string, unknown>)
+      .flatMap((v) => (Array.isArray(v) ? v : [v]))
+      .filter((m): m is string => typeof m === "string" && Boolean(m))
+  }
+  return []
+}
+
 async function extractError(res: Response): Promise<string> {
   const text = await res.text()
   if (!text) return `Request failed with status ${res.status}`
   try {
     const data = JSON.parse(text)
     if (typeof data === "string") return data
+
+    const validationMessages = collectValidationMessages(data.errors)
+    if (validationMessages.length) return validationMessages.join(" ")
+
+    const generic = "ValidationFailure"
+    if (data.detail && data.detail !== generic) return data.detail
+    if (data.title && data.title !== "One or more validation errors occurred.")
+      return data.title
+    if (data.message) return data.message
     if (data.detail) return data.detail
     if (data.title) return data.title
-    if (data.message) return data.message
-    if (data.errors) {
-      const msgs = Object.values(data.errors as Record<string, string[]>)
-        .flat()
-        .filter(Boolean)
-      if (msgs.length) return msgs.join(" ")
-    }
     return text
   } catch {
     return text

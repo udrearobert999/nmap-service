@@ -92,12 +92,16 @@ function FindingsTable({ findings }: { findings: Finding[] }) {
                 ) : (
                   <div className="flex flex-wrap gap-1">
                     {f.matchedCves.map((cve) => (
-                      <span
+                      <a
                         key={cve}
-                        className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs"
+                        href={`https://nvd.nist.gov/vuln/detail/${cve}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        title={`View ${cve} on the NVD`}
+                        className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs underline-offset-2 hover:bg-muted/70 hover:underline"
                       >
                         {cve}
-                      </span>
+                      </a>
                     ))}
                   </div>
                 )}
