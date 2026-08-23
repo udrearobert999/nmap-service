@@ -3,7 +3,7 @@ import {
   CreateOrganization,
   OrganizationList,
   useOrganization,
-} from "@clerk/clerk-react"
+} from "@clerk/react"
 import { ShieldCheck } from "lucide-react"
 
 export function OrgGate({ children }: { children: ReactNode }) {

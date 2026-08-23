@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom"
-import { OrganizationSwitcher, UserButton } from "@clerk/clerk-react"
+import { OrganizationSwitcher, UserButton } from "@clerk/react"
 import { LayoutDashboard, Radar, ShieldCheck } from "lucide-react"
 import {
   Sidebar,

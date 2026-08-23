@@ -5,7 +5,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react"
+import { RedirectToSignIn, Show } from "@clerk/react"
 import { toast } from "sonner"
 import { ApiError } from "@/api/client"
 import { AuthBridge } from "@/components/AuthBridge"
@@ -42,10 +42,10 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SignedOut>
+      <Show when="signed-out">
         <RedirectToSignIn />
-      </SignedOut>
-      <SignedIn>
+      </Show>
+      <Show when="signed-in">
         <AuthBridge />
         <OrgGate>
           <BrowserRouter>
@@ -58,7 +58,7 @@ export default function App() {
             </Routes>
           </BrowserRouter>
         </OrgGate>
-      </SignedIn>
+      </Show>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   )
