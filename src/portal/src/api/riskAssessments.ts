@@ -1,20 +1,32 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { apiFetch, apiFetchRaw, idFromLocation } from "./client"
-import { getSubject } from "@/lib/subject"
-import type { RiskAssessment } from "./types"
+import { ApiError, apiFetch, apiFetchRaw, idFromLocation } from "./client"
+import type { Paged, RiskAssessment, RiskStatus } from "./types"
 
-/**
- * Requests a risk assessment for a scan. The backend returns 202 Accepted with
- * an empty body; the id of the created assessment is read from the `Location`
- * response header when present (returns `null` otherwise, in which case the UI
- * asks the user to supply the id to track).
- */
+export interface ListRiskAssessmentsParams {
+  pageNumber: number
+  pageSize: number
+  status?: RiskStatus
+  orderBy?: string
+  orderDirection?: "asc" | "desc"
+}
+
+export function listRiskAssessments(
+  params: ListRiskAssessmentsParams,
+): Promise<Paged<RiskAssessment>> {
+  const q = new URLSearchParams()
+  q.set("pageNumber", String(params.pageNumber))
+  q.set("pageSize", String(params.pageSize))
+  if (params.status) q.set("status", params.status)
+  if (params.orderBy) q.set("orderBy", params.orderBy)
+  if (params.orderDirection) q.set("orderDirection", params.orderDirection)
+  return apiFetch<Paged<RiskAssessment>>(`/risk-assessments?${q.toString()}`)
+}
+
 export async function createRiskAssessment(
   scanId: string,
 ): Promise<{ id: string | null }> {
-  const res = await apiFetchRaw(`/risk-assessments`, {
+  const res = await apiFetchRaw(`/scans/${scanId}/risk-assessments`, {
     method: "POST",
-    body: { scanId },
     idempotent: true,
   })
   return { id: idFromLocation(res.headers.get("Location")) }
@@ -24,24 +36,32 @@ export function getRiskAssessment(id: string): Promise<RiskAssessment> {
   return apiFetch<RiskAssessment>(`/risk-assessments/${id}`)
 }
 
+export function getLatestRiskAssessment(
+  scanId: string,
+): Promise<RiskAssessment | null> {
+  return apiFetch<RiskAssessment>(`/scans/${scanId}/risk-assessment`).catch(
+    (err) => {
+      if (err instanceof ApiError && err.status === 404) return null
+      throw err
+    },
+  )
+}
+
 export function useCreateRiskAssessment() {
   return useMutation({
     mutationFn: (scanId: string) => createRiskAssessment(scanId),
   })
 }
 
-/** Poll a risk assessment until it reaches a terminal state. */
-export function useRiskAssessment(id: string | undefined) {
+export function useLatestRiskAssessment(scanId: string | undefined) {
   return useQuery({
-    queryKey: ["risk-assessment", getSubject(), id],
-    queryFn: () => getRiskAssessment(id as string),
-    enabled: !!id,
+    queryKey: ["risk-assessment-latest", scanId],
+    queryFn: () => getLatestRiskAssessment(scanId as string),
+    enabled: !!scanId,
     refetchInterval: (query) => {
       const data = query.state.data
-      if (!data) return 3000
-      return data.status === "Pending" || data.status === "Running"
-        ? 3000
-        : false
+      if (!data) return false
+      return data.status === "Pending" || data.status === "Running" ? 3000 : false
     },
   })
 }

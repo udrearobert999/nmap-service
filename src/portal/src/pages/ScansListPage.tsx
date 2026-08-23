@@ -53,6 +53,7 @@ export function ScansListPage() {
               <TableHead>Target</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Created</TableHead>
+              <TableHead>Created by</TableHead>
               <TableHead className="text-right">Results</TableHead>
             </TableRow>
           </TableHeader>
@@ -60,7 +61,7 @@ export function ScansListPage() {
             {isLoading &&
               Array.from({ length: 4 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell colSpan={4}>
+                  <TableCell colSpan={5}>
                     <Skeleton className="h-6 w-full" />
                   </TableCell>
                 </TableRow>
@@ -68,7 +69,7 @@ export function ScansListPage() {
 
             {isError && (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-destructive">
+                <TableCell colSpan={5} className="text-center text-destructive">
                   Failed to load scans: {(error as Error)?.message}
                 </TableCell>
               </TableRow>
@@ -77,7 +78,7 @@ export function ScansListPage() {
             {!isLoading && !isError && data?.items.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={5}
                   className="text-center text-muted-foreground"
                 >
                   No scans yet. Start one with “New scan”.
@@ -96,6 +97,9 @@ export function ScansListPage() {
                   <StatusBadge status={scan.status} />
                 </TableCell>
                 <TableCell>{formatDate(scan.createdAt)}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {scan.createdByEmail ?? "—"}
+                </TableCell>
                 <TableCell className="text-right">
                   {scan.results?.length ?? 0}
                 </TableCell>

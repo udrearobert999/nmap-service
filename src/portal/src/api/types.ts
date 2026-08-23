@@ -17,7 +17,20 @@ export interface Scan {
   createdAt: string
   completedAt: string | null
   errorMessage: string | null
+  createdByEmail: string | null
   results: ScanResult[]
+}
+
+export interface Finding {
+  port: number
+  service: string
+  product: string | null
+  version: string | null
+  cpe: string | null
+  matchedCves: string[]
+  cvssScore: number
+  kevFlag: boolean
+  matchConfidence: number
 }
 
 export interface RiskAssessment {
@@ -28,6 +41,18 @@ export interface RiskAssessment {
   completedAt: string | null
   errorMessage: string | null
   overallRiskScore: number | null
+  createdByEmail: string | null
+  findings: Finding[]
+}
+
+export type HealthState = "up" | "down"
+
+export interface Health {
+  database: HealthState
+  services: {
+    scanning: HealthState
+    assessment: HealthState
+  }
 }
 
 export interface Paged<T> {

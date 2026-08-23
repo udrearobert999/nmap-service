@@ -6,12 +6,7 @@ import { RiskAssessmentPanel } from "@/components/RiskAssessmentPanel"
 import { formatDate } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -59,6 +54,12 @@ export function ScanDetailPage() {
                 <dd>{formatDate(scan.createdAt)}</dd>
                 <dt className="text-muted-foreground">Completed</dt>
                 <dd>{formatDate(scan.completedAt)}</dd>
+                {scan.createdByEmail && (
+                  <>
+                    <dt className="text-muted-foreground">Requested by</dt>
+                    <dd>{scan.createdByEmail}</dd>
+                  </>
+                )}
                 {scan.errorMessage && (
                   <>
                     <dt className="text-muted-foreground">Error</dt>

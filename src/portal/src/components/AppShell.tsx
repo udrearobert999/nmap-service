@@ -1,33 +1,39 @@
-import { Link, Outlet } from "react-router-dom"
-import { ShieldCheck } from "lucide-react"
-import { TeamSwitcher } from "./TeamSwitcher"
-import { useSubject } from "@/lib/subject-context"
+import { Outlet, useLocation } from "react-router-dom"
+import { AppSidebar } from "./AppSidebar"
+import { ConnectivityIndicator } from "./ConnectivityIndicator"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
+import { Separator } from "@/components/ui/separator"
+
+function useTitle(): string {
+  const { pathname } = useLocation()
+  if (pathname === "/") return "Dashboard"
+  if (pathname.startsWith("/scans")) return "Scans"
+  return "Network Security"
+}
 
 export function AppShell() {
-  const { subject } = useSubject()
+  const title = useTitle()
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2 font-semibold">
-            <ShieldCheck className="h-6 w-6 text-primary" />
-            <span className="text-lg">Network Security Portal</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-muted-foreground sm:inline">
-              acting as
-            </span>
-            <span className="hidden rounded bg-muted px-2 py-1 font-mono text-xs sm:inline">
-              {subject}
-            </span>
-            <TeamSwitcher />
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          <span className="text-sm font-medium">{title}</span>
+          <div className="ml-auto">
+            <ConnectivityIndicator />
           </div>
-        </div>
-      </header>
-      <main className="container py-8">
-        <Outlet />
-      </main>
-    </div>
+        </header>
+        <main className="flex-1 p-4 md:p-6">
+          <Outlet />
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

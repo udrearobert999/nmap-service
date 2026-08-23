@@ -1,10 +1,5 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "./client"
-import { getSubject } from "@/lib/subject"
 import type { ListScansParams, Paged, Scan } from "./types"
 
 function buildScansQuery(params: ListScansParams): string {
@@ -33,11 +28,9 @@ export function createScan(target: string): Promise<void> {
   })
 }
 
-/** Poll the scans list while any scan is still Pending/Running. */
 export function useScans(params: ListScansParams) {
-  // Include the subject in the key so each team has its own cache.
   return useQuery({
-    queryKey: ["scans", getSubject(), params],
+    queryKey: ["scans", params],
     queryFn: () => listScans(params),
     refetchInterval: (query) => {
       const data = query.state.data
@@ -50,18 +43,15 @@ export function useScans(params: ListScansParams) {
   })
 }
 
-/** Poll a single scan until it reaches a terminal state. */
 export function useScan(id: string | undefined) {
   return useQuery({
-    queryKey: ["scan", getSubject(), id],
+    queryKey: ["scan", id],
     queryFn: () => getScan(id as string),
     enabled: !!id,
     refetchInterval: (query) => {
       const data = query.state.data
       if (!data) return 3000
-      return data.status === "Pending" || data.status === "Running"
-        ? 3000
-        : false
+      return data.status === "Pending" || data.status === "Running" ? 3000 : false
     },
   })
 }
