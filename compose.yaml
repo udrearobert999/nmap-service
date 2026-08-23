@@ -55,6 +55,7 @@
       bash -c "
         echo 'Creating Kafka topics...' &&
         kafka-topics --create --if-not-exists --topic ${KAFKA_SCAN_REQUESTS_TOPIC} --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
+        kafka-topics --create --if-not-exists --topic ${KAFKA_SCAN_RISK_ASSESSMENT_REQUESTS_TOPIC} --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
         echo 'Topics created successfully!'
       "
       
@@ -72,7 +73,7 @@
   api:
     build:
       context: .
-      dockerfile: src/NetworkMapper.WebAPI/Dockerfile
+      dockerfile: src/scans/NetworkMapper.WebAPI/Dockerfile
     container_name: network_mapper_api
     restart: unless-stopped
     ports:
@@ -82,6 +83,7 @@
       Kafka__BootstrapServers: ${KAFKA_BOOTSTRAP_SERVERS}
       Kafka__ScanRequestsTopic: ${KAFKA_SCAN_REQUESTS_TOPIC}
       Kafka__ConsumerGroupId: ${KAFKA_SCAN_REQUESTS_CONSUMER_GROUP}
+      Kafka__ScanRiskAssessmentRequestsTopic: ${KAFKA_SCAN_RISK_ASSESSMENT_REQUESTS_TOPIC}
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
     depends_on:
       postgres:
@@ -92,7 +94,7 @@
   worker:
     build:
       context: .
-      dockerfile: src/NetworkMapper.Worker/Dockerfile
+      dockerfile: src/scans/NetworkMapper.Worker/Dockerfile
     container_name: network_mapper_worker
     restart: unless-stopped
     environment:
@@ -104,6 +106,26 @@
       Kafka__ScanRequestsConcurrentConsumerLimit: ${KAFKA_SCAN_REQUESTS_CONCURRENT_CONSUMER_LIMIT}
       Nmap__TimeoutSeconds: ${NMAP_TIMEOUT_SECONDS}
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+  vulnintel-service:
+    build:
+      context: .
+      dockerfile: src/vulnerabilities/vulnintel-service/Dockerfile
+    container_name: vulnintel_service
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    environment:
+      HTTP_PORT: ${VULNINTEL_HTTP_PORT}
+      POSTGRES_DSN: ${VULNINTEL_DB_CONNECTION_STRING}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      KAFKA_CONSUMER_GROUP_ID: ${KAFKA_RISK_ASSESSMENT_CONSUMER_GROUP}
+      KAFKA_SCAN_RISK_ASSESSMENT_REQUESTS_TOPIC: ${KAFKA_SCAN_RISK_ASSESSMENT_REQUESTS_TOPIC}
     depends_on:
       postgres:
         condition: service_healthy

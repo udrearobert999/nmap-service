@@ -21,6 +21,8 @@ public class ScansServiceTests
     private readonly Mock<IValidationOrchestrator> _validationOrchestratorMock;
     private readonly Mock<IScanRepository> _scanRepositoryMock;
     private readonly Mock<IOutboxMessageRepository> _outboxMessageRepositoryMock;
+    private readonly Mock<ICurrentTeamAccessor> _currentTeamAccessorMock;
+    private readonly Mock<ICurrentUserAccessor> _currentUserAccessorMock;
     private readonly ScansService _sut;
 
     public ScansServiceTests()
@@ -29,11 +31,19 @@ public class ScansServiceTests
         _validationOrchestratorMock = new Mock<IValidationOrchestrator>();
         _scanRepositoryMock = new Mock<IScanRepository>();
         _outboxMessageRepositoryMock = new Mock<IOutboxMessageRepository>();
+        _currentTeamAccessorMock = new Mock<ICurrentTeamAccessor>();
+        _currentUserAccessorMock = new Mock<ICurrentUserAccessor>();
 
         _unitOfWorkMock.SetupGet(u => u.Scans).Returns(_scanRepositoryMock.Object);
         _unitOfWorkMock.SetupGet(u => u.OutboxMessages).Returns(_outboxMessageRepositoryMock.Object);
+        _currentTeamAccessorMock.SetupGet(t => t.TeamId).Returns(Guid.NewGuid());
+        _currentUserAccessorMock.SetupGet(u => u.UserId).Returns(Guid.NewGuid());
 
-        _sut = new ScansService(_unitOfWorkMock.Object, _validationOrchestratorMock.Object);
+        _sut = new ScansService(
+            _unitOfWorkMock.Object,
+            _validationOrchestratorMock.Object,
+            _currentTeamAccessorMock.Object,
+            _currentUserAccessorMock.Object);
     }
 
     [Fact]

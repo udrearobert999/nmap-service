@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\NetworkMapper.Application\NetworkMapper.Application.csproj" />
+      <ProjectReference Include="..\..\src\scans\NetworkMapper.Application\NetworkMapper.Application.csproj" />
     </ItemGroup>
 
 </Project>

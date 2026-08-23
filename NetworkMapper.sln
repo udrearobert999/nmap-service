@@ -3,23 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.Application", "src\NetworkMapper.Application\NetworkMapper.Application.csproj", "{43A7D288-02B0-4A31-B841-21D8EDD3755C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.Application", "src\scans\NetworkMapper.Application\NetworkMapper.Application.csproj", "{43A7D288-02B0-4A31-B841-21D8EDD3755C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.Domain", "src\NetworkMapper.Domain\NetworkMapper.Domain.csproj", "{3F49B881-B6D3-4855-8E68-6C50EBAA0954}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.Domain", "src\scans\NetworkMapper.Domain\NetworkMapper.Domain.csproj", "{3F49B881-B6D3-4855-8E68-6C50EBAA0954}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.Infrastructure", "src\NetworkMapper.Infrastructure\NetworkMapper.Infrastructure.csproj", "{AD0A7B52-78F2-4BD6-9615-C35A2DE75EEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.Infrastructure", "src\scans\NetworkMapper.Infrastructure\NetworkMapper.Infrastructure.csproj", "{AD0A7B52-78F2-4BD6-9615-C35A2DE75EEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.WebAPI", "src\NetworkMapper.WebAPI\NetworkMapper.WebAPI.csproj", "{B23BE9A6-7BBD-4DB3-8ACB-15A331692DAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkMapper.WebAPI", "src\scans\NetworkMapper.WebAPI\NetworkMapper.WebAPI.csproj", "{B23BE9A6-7BBD-4DB3-8ACB-15A331692DAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Worker", "src\NetworkMapper.Worker\NetworkMapper.Worker.csproj", "{EB8100A6-066F-444B-B1F5-D8F1F33F38B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Worker", "src\scans\NetworkMapper.Worker\NetworkMapper.Worker.csproj", "{EB8100A6-066F-444B-B1F5-D8F1F33F38B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Application.Worker", "src\NetworkMapper.Application.Worker\NetworkMapper.Application.Worker.csproj", "{DAD880E1-B7E0-449A-9A45-8062BE7E4F04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Application.Worker", "src\scans\NetworkMapper.Application.Worker\NetworkMapper.Application.Worker.csproj", "{DAD880E1-B7E0-449A-9A45-8062BE7E4F04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Contracts", "src\NetworkMapper.Contracts\NetworkMapper.Contracts.csproj", "{E50B3A25-3014-46CA-9C79-C2AEFDF0BD8A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Contracts", "src\scans\NetworkMapper.Contracts\NetworkMapper.Contracts.csproj", "{E50B3A25-3014-46CA-9C79-C2AEFDF0BD8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Infrastructure.Persistence", "src\NetworkMapper.Infrastructure.Persistence\NetworkMapper.Infrastructure.Persistence.csproj", "{9DADF325-283B-4FE7-834C-4B4966143E88}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Infrastructure.Persistence", "src\scans\NetworkMapper.Infrastructure.Persistence\NetworkMapper.Infrastructure.Persistence.csproj", "{9DADF325-283B-4FE7-834C-4B4966143E88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Infrastructure.Worker", "src\NetworkMapper.Infrastructure.Worker\NetworkMapper.Infrastructure.Worker.csproj", "{B3B8534B-EE8E-401D-9E53-3B9BE6A18AFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMapper.Infrastructure.Worker", "src\scans\NetworkMapper.Infrastructure.Worker\NetworkMapper.Infrastructure.Worker.csproj", "{B3B8534B-EE8E-401D-9E53-3B9BE6A18AFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AAF0325C-EAEA-4AF6-B395-CA52AFDF1150}"
 	ProjectSection(SolutionItems) = preProject
