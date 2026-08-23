@@ -7,6 +7,8 @@ namespace Vantage.Application.Worker.Runners;
 
 internal sealed class NmapScanRunner : IScanRunner
 {
+    private const string HostTimeout = "600s";
+
     private readonly TimeSpan _scanTimeout;
 
     public NmapScanRunner(IOptions<NmapOptions> options)
@@ -47,9 +49,13 @@ internal sealed class NmapScanRunner : IScanRunner
             CreateNoWindow = true
         };
         
-        // Handles script injection
         startInfo.ArgumentList.Add("-Pn");
         startInfo.ArgumentList.Add("-sV");
+        startInfo.ArgumentList.Add("-T4");
+        startInfo.ArgumentList.Add("--max-retries");
+        startInfo.ArgumentList.Add("1");
+        startInfo.ArgumentList.Add("--host-timeout");
+        startInfo.ArgumentList.Add(HostTimeout);
         startInfo.ArgumentList.Add("-oX");
         startInfo.ArgumentList.Add("-");
         startInfo.ArgumentList.Add(target);
@@ -84,12 +90,6 @@ internal sealed class NmapScanRunner : IScanRunner
 
     private static void ValidateScanResults(string target, int exitCode, string output, string error)
     {
-        if (!string.IsNullOrWhiteSpace(error))
-        {
-            throw new InvalidOperationException(
-                $"Nmap could not resolve or scan target '{target}'. Details: {error.Trim()}");
-        }
-
         if (exitCode != 0)
         {
             throw new InvalidOperationException(
