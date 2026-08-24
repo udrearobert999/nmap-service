@@ -45,4 +45,15 @@ public class DashboardController : ApiControllerBase
 
         return Ok(points);
     }
+
+    [HttpGet("summary")]
+    [ProducesResponseType(typeof(DashboardSummaryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetSummary(CancellationToken cancellationToken)
+    {
+        var summary = await _dashboardService.GetSummaryAsync(cancellationToken);
+
+        return Ok(summary);
+    }
 }

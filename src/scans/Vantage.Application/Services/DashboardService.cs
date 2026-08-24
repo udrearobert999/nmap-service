@@ -1,4 +1,5 @@
 using Vantage.Application.Services.Abstractions;
+using Vantage.Contracts.Constants;
 using Vantage.Contracts.Dashboard;
 using Vantage.Domain.Abstractions;
 
@@ -39,6 +40,23 @@ internal sealed class DashboardService : IDashboardService
         }
 
         return points;
+    }
+
+    public async Task<DashboardSummaryDto> GetSummaryAsync(CancellationToken cancellationToken = default)
+    {
+        var totalScans = await _unitOfWork.Scans.CountAsync(cancellationToken);
+        var totalAssessments =
+            await _unitOfWork.ScanRiskAssessments.CountByStatusAsync(null, cancellationToken);
+        var completedAssessments =
+            await _unitOfWork.ScanRiskAssessments.CountByStatusAsync(Status.Completed, cancellationToken);
+        var averageRiskScore =
+            await _unitOfWork.ScanRiskAssessments.GetAverageOverallRiskScoreAsync(cancellationToken);
+
+        var roundedAverage = averageRiskScore.HasValue
+            ? Math.Round(averageRiskScore.Value, 1, MidpointRounding.AwayFromZero)
+            : (double?)null;
+
+        return new DashboardSummaryDto(totalScans, totalAssessments, completedAssessments, roundedAverage);
     }
 
     private static Dictionary<DateTime, int> BucketCounts(IReadOnlyList<DateTime> times, bool isHour)

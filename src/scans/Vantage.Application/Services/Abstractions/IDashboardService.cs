@@ -9,4 +9,6 @@ public interface IDashboardService
         DateTime toUtc,
         string bucket,
         CancellationToken cancellationToken = default);
+
+    Task<DashboardSummaryDto> GetSummaryAsync(CancellationToken cancellationToken = default);
 }

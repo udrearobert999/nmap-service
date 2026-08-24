@@ -60,6 +60,11 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.AsNoTracking().CountAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<Scan>> GetScansAsync(GetScansOptionsDto options,
         CancellationToken cancellationToken = default)
     {

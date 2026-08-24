@@ -15,4 +15,8 @@ public interface IScanRiskAssessmentRepository : IRepository<ScanRiskAssessment,
 
     Task<IReadOnlyList<DateTime>> GetRequestedAtInRangeAsync(DateTime fromUtc, DateTime toUtc,
         CancellationToken cancellationToken = default);
+
+    Task<int> CountByStatusAsync(string? status, CancellationToken cancellationToken = default);
+
+    Task<double?> GetAverageOverallRiskScoreAsync(CancellationToken cancellationToken = default);
 }

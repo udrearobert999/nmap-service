@@ -58,6 +58,24 @@ internal sealed class ScanRiskAssessmentRepository : Repository<ScanRiskAssessme
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<int> CountByStatusAsync(string? status, CancellationToken cancellationToken = default)
+    {
+        var query = _dbSet.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(status))
+            query = query.Where(r => r.Status == status);
+
+        return await query.CountAsync(cancellationToken);
+    }
+
+    public async Task<double?> GetAverageOverallRiskScoreAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Where(r => r.Status == Status.Completed && r.OverallRiskScore != null)
+            .AverageAsync(r => (double?)r.OverallRiskScore, cancellationToken);
+    }
+
     private static IQueryable<ScanRiskAssessment> ApplyFiltering(
         IQueryable<ScanRiskAssessment> query,
         GetScanRiskAssessmentsOptionsDto options)
