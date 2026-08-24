@@ -12,4 +12,7 @@ public interface IScanRiskAssessmentRepository : IRepository<ScanRiskAssessment,
     Task<ScanRiskAssessment?> GetLatestByScanAsync(Guid scanId, CancellationToken cancellationToken = default);
 
     Task<ScanRiskAssessment?> GetWithFindingsByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<DateTime>> GetRequestedAtInRangeAsync(DateTime fromUtc, DateTime toUtc,
+        CancellationToken cancellationToken = default);
 }

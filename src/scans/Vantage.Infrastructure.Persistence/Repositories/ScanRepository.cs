@@ -50,6 +50,16 @@ internal sealed class ScanRepository : Repository<Scan, Guid>, IScanRepository
             .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<DateTime>> GetCreatedAtInRangeAsync(DateTime fromUtc, DateTime toUtc,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Where(s => s.CreatedAt >= fromUtc && s.CreatedAt < toUtc)
+            .Select(s => s.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<Scan>> GetScansAsync(GetScansOptionsDto options,
         CancellationToken cancellationToken = default)
     {

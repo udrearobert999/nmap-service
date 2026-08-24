@@ -60,6 +60,12 @@ export interface Paged<T> {
   total: number
 }
 
+export interface ActivityPoint {
+  bucket: string
+  scans: number
+  assessments: number
+}
+
 export interface ListScansParams {
   pageNumber: number
   pageSize: number

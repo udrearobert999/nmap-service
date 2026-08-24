@@ -16,4 +16,7 @@ public interface IScanRepository : IRepository<Scan, Guid>
 
     Task<IList<Scan>> GetLatestCompletedScansAsync(string target, int count,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<DateTime>> GetCreatedAtInRangeAsync(DateTime fromUtc, DateTime toUtc,
+        CancellationToken cancellationToken = default);
 }

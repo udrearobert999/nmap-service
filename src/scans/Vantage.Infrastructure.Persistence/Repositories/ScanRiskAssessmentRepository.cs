@@ -48,6 +48,16 @@ internal sealed class ScanRiskAssessmentRepository : Repository<ScanRiskAssessme
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<DateTime>> GetRequestedAtInRangeAsync(DateTime fromUtc, DateTime toUtc,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Where(r => r.RequestedAt >= fromUtc && r.RequestedAt < toUtc)
+            .Select(r => r.RequestedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     private static IQueryable<ScanRiskAssessment> ApplyFiltering(
         IQueryable<ScanRiskAssessment> query,
         GetScanRiskAssessmentsOptionsDto options)

@@ -1,10 +1,10 @@
 import { useDashboard } from "@/api/dashboard"
 import { SectionCards } from "@/components/SectionCards"
-import { ScansChart } from "@/components/ScansChart"
+import { ActivityChart } from "@/components/ActivityChart"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function DashboardPage() {
-  const { stats, chartData, isLoading } = useDashboard()
+  const { stats, isLoading } = useDashboard()
 
   return (
     <div className="space-y-6">
@@ -25,7 +25,7 @@ export function DashboardPage() {
         <SectionCards stats={stats} />
       )}
 
-      <ScansChart data={chartData} />
+      <ActivityChart />
     </div>
   )
 }
