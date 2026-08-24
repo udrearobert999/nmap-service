@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom"
-import { OrganizationSwitcher, UserButton } from "@clerk/react"
-import { LayoutDashboard, Radar, ShieldCheck } from "lucide-react"
+import { OrganizationSwitcher } from "@clerk/react"
+import { Activity, LayoutDashboard, Radar, ShieldCheck } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +16,7 @@ import {
 const navItems = [
   { title: "Dashboard", to: "/", icon: LayoutDashboard, exact: true },
   { title: "Scans", to: "/scans", icon: Radar, exact: false },
+  { title: "Status", to: "/status", icon: Activity, exact: false },
 ]
 
 export function AppSidebar() {
@@ -58,17 +59,12 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t">
-        <div className="flex w-full items-center justify-between gap-3 px-2 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
-          <div className="min-w-0 flex-1 overflow-hidden">
-            <OrganizationSwitcher
-              hidePersonal
-              afterSelectOrganizationUrl="/"
-              afterCreateOrganizationUrl="/"
-            />
-          </div>
-          <div className="shrink-0">
-            <UserButton />
-          </div>
+        <div className="min-w-0 overflow-hidden px-2 py-1">
+          <OrganizationSwitcher
+            hidePersonal
+            afterSelectOrganizationUrl="/"
+            afterCreateOrganizationUrl="/"
+          />
         </div>
       </SidebarFooter>
     </Sidebar>

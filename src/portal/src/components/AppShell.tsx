@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom"
+import { UserButton } from "@clerk/react"
 import { AppSidebar } from "./AppSidebar"
-import { ConnectivityIndicator } from "./ConnectivityIndicator"
 import {
   SidebarInset,
   SidebarProvider,
@@ -12,6 +12,7 @@ function useTitle(): string {
   const { pathname } = useLocation()
   if (pathname === "/") return "Dashboard"
   if (pathname.startsWith("/scans")) return "Scans"
+  if (pathname.startsWith("/status")) return "Status"
   return "Vantage"
 }
 
@@ -27,7 +28,7 @@ export function AppShell() {
           <Separator orientation="vertical" className="mr-2 h-4" />
           <span className="text-sm font-medium">{title}</span>
           <div className="ml-auto">
-            <ConnectivityIndicator />
+            <UserButton />
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6">

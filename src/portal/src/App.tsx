@@ -14,6 +14,7 @@ import { AppShell } from "@/components/AppShell"
 import { DashboardPage } from "@/pages/DashboardPage"
 import { ScansListPage } from "@/pages/ScansListPage"
 import { ScanDetailPage } from "@/pages/ScanDetailPage"
+import { StatusPage } from "@/pages/StatusPage"
 import { Toaster } from "@/components/ui/sonner"
 
 function notifyIfNoOrg(error: unknown, key?: unknown) {
@@ -54,6 +55,7 @@ export default function App() {
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/scans" element={<ScansListPage />} />
                 <Route path="/scans/:id" element={<ScanDetailPage />} />
+                <Route path="/status" element={<StatusPage />} />
               </Route>
             </Routes>
           </BrowserRouter>
