@@ -58,7 +58,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t">
-        <div className="flex w-full items-center justify-between gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col">
+        <div className="flex w-full items-center justify-between gap-3 px-2 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
           <div className="min-w-0 flex-1 overflow-hidden">
             <OrganizationSwitcher
               hidePersonal
