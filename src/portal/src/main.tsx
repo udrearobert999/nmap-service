@@ -27,7 +27,10 @@ const clerkAppearance = {
   },
   elements: {
     card: "border border-[#292929]",
-    organizationSwitcherTrigger: "text-[#ededed] hover:bg-[#262626]",
+    organizationSwitcherTrigger:
+      "text-[#ededed] hover:bg-[#262626] w-full max-w-full justify-start",
+    organizationPreviewTextContainer: "min-w-0",
+    organizationPreviewMainIdentifier: "truncate",
     userButtonPopoverCard: "border border-[#292929]",
   },
 }

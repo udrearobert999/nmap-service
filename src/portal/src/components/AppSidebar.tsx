@@ -58,13 +58,17 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t">
-        <div className="flex items-center justify-between gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col">
-          <OrganizationSwitcher
-            hidePersonal
-            afterSelectOrganizationUrl="/"
-            afterCreateOrganizationUrl="/"
-          />
-          <UserButton />
+        <div className="flex w-full items-center justify-between gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <OrganizationSwitcher
+              hidePersonal
+              afterSelectOrganizationUrl="/"
+              afterCreateOrganizationUrl="/"
+            />
+          </div>
+          <div className="shrink-0">
+            <UserButton />
+          </div>
         </div>
       </SidebarFooter>
     </Sidebar>
