@@ -70,6 +70,34 @@ STYLE RULES
   files or entire classes.
 - Prefer tables for comparisons and enumerations.
 
+FORMATTING AND TYPOGRAPHY
+Apply the following specification, which was measured from the attached example
+theses. Do not invent a different typeface: Times New Roman is used throughout
+both example theses and is the expected convention at this faculty.
+- Body text: Times New Roman, 12 pt, 1.5 line spacing, justified, first-line
+  indent 1.27 cm.
+- Chapter heading (level 1): Times New Roman, 16 pt, bold, starting on a new
+  page.
+- Section heading (level 2): Times New Roman, 14 pt, bold.
+- Subsection heading (level 3): Times New Roman, 13 pt, bold.
+- Sub-subsection heading (level 4): Times New Roman, 12 pt, bold.
+- Figure and table captions: Times New Roman, 10 pt, centred. Figure captions go
+  below the figure, table captions above the table.
+- Code listings: Courier New, 10 pt, single spacing, not justified.
+- Footnotes: Times New Roman, 10 pt.
+- Page margins: 2.5 cm top, bottom and right; 3 cm left for binding.
+- Page numbers centred in the footer.
+
+Headings MUST use Word's built-in Heading 1, Heading 2, Heading 3 and Heading 4
+styles rather than manually formatted bold text, with the styles redefined to the
+sizes above. This is essential: the author generates the table of contents, the
+list of figures and the list of tables automatically from those styles, and
+manually formatted headings would be invisible to that process.
+
+Use automatic numbering for headings (1, 1.1, 1.1.1, 1.1.1.1), for figure
+captions (Figure 1.1, Figure 1.2, …) and for table captions (Table 1.1, …),
+numbered per chapter.
+
 FIGURE AND TABLE PLACEHOLDERS
 Insert every figure listed in the CHAPTER PLAN at the point in the text where it
 is first referenced. Use exactly this three-line format, on its own lines:
@@ -832,10 +860,30 @@ PostgreSQL and output caching is per-instance and cheap to rebuild.
 ================================================================================
 OUTPUT FORMAT
 ================================================================================
-Markdown with numbered headings. Deliver the chapters in order, starting with
-Chapter 1. If output limits prevent producing everything in one response, stop at
-a chapter boundary, state clearly where you stopped, and continue from exactly
-that point when asked, without repeating earlier content and without summarising
-it.
+Produce a downloadable Microsoft Word document (.docx), formatted exactly as
+specified in the FORMATTING AND TYPOGRAPHY section: Times New Roman throughout,
+Word's built-in Heading 1 to Heading 4 styles redefined to the sizes given,
+automatic heading and caption numbering, 1.5 line spacing, justified body text,
+and the stated page margins.
+
+The document contains the body only, starting at Chapter 1. It must NOT contain
+a title page, originality declaration, theme sheet, supervisor's report,
+acknowledgements, table of contents, list of figures or list of tables. The
+author writes those separately and generates the contents lists from the heading
+styles, which is why those styles must be used properly.
+
+Figure placeholders remain as text in the document, in the three-line format
+given above, so the author can replace each one with the finished image.
+
+If a .docx cannot be produced, fall back to Markdown using # for Chapter, ## for
+section, ### for subsection and #### for sub-subsection, applied strictly and
+consistently so the heading levels map onto Word styles when the document is
+assembled, and state clearly that a fallback was used.
+
+Deliver the chapters in order. If output limits prevent producing everything in
+one response, stop at a chapter boundary, state clearly where you stopped, and
+continue from exactly that point when asked, without repeating earlier content
+and without summarising it. If the document is delivered in several parts, the
+final response must assemble all chapters into a single .docx.
 
 Begin with Chapter 1.
