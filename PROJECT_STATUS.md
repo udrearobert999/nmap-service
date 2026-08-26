@@ -61,31 +61,66 @@ Patterns: Clean Architecture, Repository, Unit of Work, Transactional Outbox
   table: CVSS/KEV/confidence badges, matched CVEs), connectivity dots.
 - Clerk widgets dark-themed via `@clerk/themes`.
 
+### CPE matching evaluation
+Reproduce with `go run ./cmd/cpe-eval [-failures]` (or
+`go test ./internal/cpe/eval/ -v`) in `src/vulnerabilities/vulnintel-service`.
+
+A hand-labelled corpus of 34 real `nmap -sV` banners (Metasploitable2, DVWA,
+common services, plus a held-out set of products deliberately absent from the
+dictionary) is scored against a naive baseline that lowercases the product into
+both vendor and product and takes the version verbatim. A sample counts as a
+true positive only when the emitted CPE matches the label exactly and clears the
+confidence threshold; banners with no catalogued product must be abstained on.
+
+| resolver | threshold | precision | recall | F1 |
+|---|---|---|---|---|
+| naive | 0.00 | 0.333 | 1.000 | 0.500 |
+| dictionary | 0.00 | 0.818 | 1.000 | 0.900 |
+| dictionary | 0.50 | 1.000 | 0.742 | 0.852 |
+| dictionary | 0.90 | 1.000 | 0.677 | 0.808 |
+
+Findings:
+- Dictionary + version normalisation lifts F1 from 0.500 to 0.900 at the same
+  recall; the naive baseline's precision collapses because distro-patched
+  versions (`4.7p1 Debian 8ubuntu1`) and compound product strings never match.
+- The confidence tier is what buys precision: rejecting below 0.5 removes every
+  false positive (1.000 precision) at the cost of recall, so the score is a
+  usable abstention signal rather than decoration.
+- The evaluation found two real defects, now fixed: MySQL was mapped to
+  `mysql:mysql` when NVD publishes `oracle:mysql` (so MySQL CVE lookups silently
+  returned nothing), and Tomcat's actual banner
+  (`Apache Tomcat/Coyote JSP engine`) fell back to `apache:apache`.
+- Open calibration gap: 4 of the 8 rejections at 0.5 (OpenLDAP, HAProxy,
+  Memcached, Dovecot) emitted the *correct* CPE but scored 0.40. The fallback is
+  right more often than its confidence admits whenever vendor equals product;
+  raising that case would recover recall without costing precision.
+
+Caveat: the corpus is hand-labelled and small, and the dictionary was corrected
+in response to it, so in-dictionary figures are optimistic. The held-out block
+is the generalisation signal.
+
 ### Verified
-- .NET build + 22 unit tests green; Go build/vet/gofmt + cpe/scoring tests green.
+- .NET build + 22 unit tests green; Go build/vet/gofmt + cpe/scoring/eval tests
+  green.
 - Full stack e2e in Docker: scan → risk assessment → real CVE findings (e.g.
   PostgreSQL → 20 CVEs, CVSS 9.8); tenant isolation; connectivity dots.
 - Portal `npm run build` green; dashboard visually verified against the design.
 
 ## Still to do
 
-- **Portal runtime verification** — needs a real Clerk `pk_test_` key (dev
-  instance, Organizations enabled) in `src/portal/.env.local`; only build +
-  mock-data screenshot done so far.
 - **Real Clerk JWT validation on the backend** — today Development uses the dev
   header bypass; wire `Clerk__Authority` for non-Development and test with real
   tokens.
 - **Clerk webhooks** — JIT sync only reflects the active caller; full member
   roster + removals need `user.*`/`organization*.*` webhooks (needs a public URL).
-- **Dashboard aggregate endpoint** — stats are computed client-side over a
-  25-item page (avg risk is "recent"); add `/dashboard/summary` for exact totals.
-- **CPE matching evaluation** — precision/recall vs. a naive baseline against
-  known-vulnerable targets (Metasploitable2/DVWA) — the dissertation's headline
-  empirical contribution.
+- **CPE confidence calibration** — the evaluation shows the fallback emits the
+  correct CPE at 0.40 confidence whenever vendor equals product; raising that
+  case (and widening the corpus) is the obvious next experiment.
 - **NVD coverage** — CVEs are fetched on demand + cached (not a full mirror);
-  first assessment of a new service makes a network call. Rate-limit/backoff and
-  a fuller sync are future work.
-- **Scan-diff / dashboards / risk-trend** UI pages (backend diff exists; no UI).
+  first assessment of a new service makes a network call. A fuller offline sync
+  is future work.
+- **Risk-trend UI** — scan diff now has a page; per-target risk-score history
+  over time does not.
 - **Kubernetes** — deferred; everything runs on Docker Compose.
 - **Distro-patched false positives** — naive version matching flags e.g.
   Ubuntu-backported Apache; treat as a confidence-tier limitation.
