@@ -88,6 +88,7 @@
       Auth__Mode: ${AUTH_MODE:-}
       Clerk__Authority: ${CLERK_AUTHORITY:-}
       Clerk__Audience: ${CLERK_AUDIENCE:-}
+      ClerkWebhook__SigningSecret: ${CLERK_WEBHOOK_SIGNING_SECRET:-}
     depends_on:
       postgres:
         condition: service_healthy

@@ -57,6 +57,30 @@ Clerk's v2 session token nests the active organisation under an `o` claim
 (`{"id": "...", "rol": "admin"}`) rather than flat `org_id`/`org_role`; identity
 resolution reads both shapes and strips an `org:` role prefix.
 
+### Clerk webhooks
+`POST /api/webhooks/clerk` (anonymous) keeps the local roster in step with Clerk
+for users who never call the API, which JIT sync cannot do.
+
+Every request is verified as a Svix signature: HMAC-SHA256 over
+`{svix-id}.{svix-timestamp}.{raw body}` compared in constant time, with a
+five-minute timestamp window so captured deliveries cannot be replayed. An
+unsigned, tampered or stale request is rejected with 401 and never reaches a
+handler. With no signing secret configured the endpoint answers 503 rather than
+accepting unverified events.
+
+Handled events: `user.created/updated/deleted`,
+`organization.created/updated/deleted`,
+`organizationMembership.created/updated/deleted`. Unknown types are acknowledged
+with 200 and ignored, so Svix does not retry events the system does not model.
+
+Two deliberate choices:
+- `user.deleted` revokes the user's memberships but keeps the `User` row.
+  `Scan.CreatedByUserId` is `DeleteBehavior.Restrict`, and deleting authorship
+  history to satisfy a membership change would be wrong for an audit trail.
+- `organization.deleted` deletes the `Team`, which cascades that tenant's scans
+  and assessments. The tenant no longer exists, and the rows would otherwise be
+  unreachable behind the team query filter.
+
 ### Multi-tenancy + auth (Clerk Organizations)
 - `User` + `Team` (= Clerk org) + `TeamMembership` (role), JIT-mirrored from the
   Clerk JWT on each request (`IdentitySyncService`).
@@ -128,8 +152,10 @@ is the generalisation signal.
   `email`/`name`, so under `Auth__Mode=Clerk` the "created by" column is blank.
   Add them in the Clerk dashboard (Sessions → customise session token) as
   `{"email": "{{user.primary_email_address}}", "name": "{{user.full_name}}"}`.
-- **Clerk webhooks** — JIT sync only reflects the active caller; full member
-  roster + removals need `user.*`/`organization*.*` webhooks (needs a public URL).
+- **Clerk webhook delivery wiring** — the endpoint, verification and handlers are
+  done and tested; what remains is operational: create the endpoint in the Clerk
+  dashboard, copy its signing secret into `CLERK_WEBHOOK_SIGNING_SECRET`, and
+  expose the API publicly (`clerk webhooks listen` or a tunnel) so events arrive.
 - **CPE confidence calibration** — the evaluation shows the fallback emits the
   correct CPE at 0.40 confidence whenever vendor equals product; raising that
   case (and widening the corpus) is the obvious next experiment.

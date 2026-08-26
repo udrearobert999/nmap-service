@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\scans\Vantage.Application\Vantage.Application.csproj" />
+      <ProjectReference Include="..\..\src\scans\Vantage.WebAPI\Vantage.WebAPI.csproj" />
     </ItemGroup>
 
 </Project>

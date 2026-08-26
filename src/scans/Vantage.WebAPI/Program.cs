@@ -56,6 +56,9 @@ else
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddOptions<ClerkWebhookOptions>()
+    .Bind(configuration.GetSection(ClerkWebhookOptions.SectionName));
+
 builder.Services
     .AddApplication()
     .AddPersistence(configuration)
