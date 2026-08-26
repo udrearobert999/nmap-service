@@ -1,6 +1,12 @@
 import { Link, useLocation } from "react-router-dom"
 import { OrganizationSwitcher } from "@clerk/react"
-import { Activity, LayoutDashboard, Radar, ShieldCheck } from "lucide-react"
+import {
+  Activity,
+  GitCompareArrows,
+  LayoutDashboard,
+  Radar,
+  ShieldCheck,
+} from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +22,7 @@ import {
 const navItems = [
   { title: "Dashboard", to: "/", icon: LayoutDashboard, exact: true },
   { title: "Scans", to: "/scans", icon: Radar, exact: false },
+  { title: "Diff", to: "/diff", icon: GitCompareArrows, exact: false },
   { title: "Status", to: "/status", icon: Activity, exact: false },
 ]
 

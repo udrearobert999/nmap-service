@@ -66,6 +66,20 @@ export interface ActivityPoint {
   assessments: number
 }
 
+export interface PortStateChange {
+  port: number
+  protocol: string
+  oldState: string
+  newState: string
+}
+
+export interface ScanDiff {
+  addedPorts: ScanResult[]
+  removedPorts: ScanResult[]
+  changedPorts: PortStateChange[]
+  unchangedPorts: ScanResult[]
+}
+
 export interface ListScansParams {
   pageNumber: number
   pageSize: number

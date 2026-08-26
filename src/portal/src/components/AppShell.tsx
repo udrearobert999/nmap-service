@@ -12,6 +12,7 @@ function useTitle(): string {
   const { pathname } = useLocation()
   if (pathname === "/") return "Dashboard"
   if (pathname.startsWith("/scans")) return "Scans"
+  if (pathname.startsWith("/diff")) return "Diff"
   if (pathname.startsWith("/status")) return "Status"
   return "Vantage"
 }
