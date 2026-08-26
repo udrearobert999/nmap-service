@@ -14,6 +14,7 @@ public interface IUnitOfWork
     public IRepository<TeamMembership, Guid> TeamMemberships { get; set; }
     public Task SaveChangesAsync(CancellationToken cancellationToken = default);
     public bool IsUniqueConstraintViolation(Exception exception);
+    public void Detach(object entity);
     Task BeginTransactionAsync(
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
         CancellationToken cancellationToken = default);

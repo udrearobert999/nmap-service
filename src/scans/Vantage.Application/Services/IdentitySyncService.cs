@@ -73,9 +73,13 @@ internal sealed class IdentitySyncService : IIdentitySyncService
         }
         catch (Exception ex) when (_unitOfWork.IsUniqueConstraintViolation(ex))
         {
+            _unitOfWork.Detach(user);
+
             var raced = await _unitOfWork.Users
                 .FirstOrDefaultAsync(u => u.ClerkUserId == identity.UserExternalId, cancellationToken);
-            return raced!.Id;
+
+            return raced?.Id ?? throw new InvalidOperationException(
+                "User insert lost a race but the winning row could not be read back.");
         }
     }
 
@@ -106,9 +110,13 @@ internal sealed class IdentitySyncService : IIdentitySyncService
         }
         catch (Exception ex) when (_unitOfWork.IsUniqueConstraintViolation(ex))
         {
+            _unitOfWork.Detach(team);
+
             var raced = await _unitOfWork.Teams
                 .FirstOrDefaultAsync(t => t.ClerkOrgId == orgExternalId, cancellationToken);
-            return raced!.Id;
+
+            return raced?.Id ?? throw new InvalidOperationException(
+                "Team insert lost a race but the winning row could not be read back.");
         }
     }
 
@@ -143,6 +151,7 @@ internal sealed class IdentitySyncService : IIdentitySyncService
         }
         catch (Exception ex) when (_unitOfWork.IsUniqueConstraintViolation(ex))
         {
+            _unitOfWork.Detach(membership);
         }
     }
 }

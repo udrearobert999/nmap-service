@@ -19,8 +19,15 @@ var configuration = builder.Configuration;
 
 configuration.AddEnvironmentVariables();
 
-if (builder.Environment.IsDevelopment())
+var authOptions = configuration.GetSection(AuthOptions.SectionName).Get<AuthOptions>() ?? new AuthOptions();
+var authMode = authOptions.Resolve(builder.Environment.IsDevelopment());
+
+if (authMode == AuthMode.DevHeaders)
 {
+    if (!builder.Environment.IsDevelopment())
+        throw new InvalidOperationException(
+            "Auth:Mode=DevHeaders trusts unauthenticated X-Dev-* headers and is only allowed in Development.");
+
     builder.Services.AddAuthentication(DevSubjectAuthenticationHandler.SchemeName)
         .AddScheme<AuthenticationSchemeOptions, DevSubjectAuthenticationHandler>(
             DevSubjectAuthenticationHandler.SchemeName, _ => { });
@@ -28,12 +35,17 @@ if (builder.Environment.IsDevelopment())
 else
 {
     builder.Services.AddOptions<ClerkOptions>()
-        .Bind(configuration.GetSection(ClerkOptions.SectionName));
+        .Bind(configuration.GetSection(ClerkOptions.SectionName))
+        .Validate(clerk => !string.IsNullOrWhiteSpace(clerk.Authority),
+            "Clerk:Authority is required when Auth:Mode=Clerk.")
+        .ValidateOnStart();
 
     builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
         .Configure<IOptions<ClerkOptions>>((jwtOptions, clerk) =>
         {
             jwtOptions.Authority = clerk.Value.Authority;
+            jwtOptions.MapInboundClaims = false;
+            jwtOptions.TokenValidationParameters.NameClaimType = "sub";
             jwtOptions.TokenValidationParameters.ValidateAudience = !string.IsNullOrWhiteSpace(clerk.Value.Audience);
             jwtOptions.TokenValidationParameters.ValidAudience = clerk.Value.Audience;
         });

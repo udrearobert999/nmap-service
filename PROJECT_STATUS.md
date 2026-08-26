@@ -41,6 +41,22 @@ Patterns: Clean Architecture, Repository, Unit of Work, Transactional Outbox
   local **CVE cache** (7-day TTL), weighted scoring (CVSS × KEV, heuristic tier
   for CVE-less risky services). Findings persisted + exposed on the API.
 
+### Auth modes
+`Auth__Mode` selects how requests are authenticated, independently of
+`ASPNETCORE_ENVIRONMENT`:
+
+- `DevHeaders` — trusts `X-Dev-*` headers. Refuses to start outside Development.
+- `Clerk` — validates real Clerk JWTs against `Clerk__Authority` (optionally
+  `Clerk__Audience`). Startup fails fast if the authority is missing.
+
+Blank falls back to `DevHeaders` in Development and `Clerk` elsewhere, so
+`AUTH_MODE=Clerk` + `CLERK_AUTHORITY=https://<slug>.clerk.accounts.dev` lets you
+exercise real token validation locally with Swagger still available.
+
+Clerk's v2 session token nests the active organisation under an `o` claim
+(`{"id": "...", "rol": "admin"}`) rather than flat `org_id`/`org_role`; identity
+resolution reads both shapes and strips an `org:` role prefix.
+
 ### Multi-tenancy + auth (Clerk Organizations)
 - `User` + `Team` (= Clerk org) + `TeamMembership` (role), JIT-mirrored from the
   Clerk JWT on each request (`IdentitySyncService`).
@@ -108,9 +124,10 @@ is the generalisation signal.
 
 ## Still to do
 
-- **Real Clerk JWT validation on the backend** — today Development uses the dev
-  header bypass; wire `Clerk__Authority` for non-Development and test with real
-  tokens.
+- **Clerk session-token custom claims** — Clerk's v2 session token carries no
+  `email`/`name`, so under `Auth__Mode=Clerk` the "created by" column is blank.
+  Add them in the Clerk dashboard (Sessions → customise session token) as
+  `{"email": "{{user.primary_email_address}}", "name": "{{user.full_name}}"}`.
 - **Clerk webhooks** — JIT sync only reflects the active caller; full member
   roster + removals need `user.*`/`organization*.*` webhooks (needs a public URL).
 - **CPE confidence calibration** — the evaluation shows the fallback emits the

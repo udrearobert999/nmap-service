@@ -85,6 +85,9 @@
       Kafka__ConsumerGroupId: ${KAFKA_SCAN_REQUESTS_CONSUMER_GROUP}
       Kafka__ScanRiskAssessmentRequestsTopic: ${KAFKA_SCAN_RISK_ASSESSMENT_REQUESTS_TOPIC}
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      Auth__Mode: ${AUTH_MODE:-}
+      Clerk__Authority: ${CLERK_AUTHORITY:-}
+      Clerk__Audience: ${CLERK_AUDIENCE:-}
     depends_on:
       postgres:
         condition: service_healthy

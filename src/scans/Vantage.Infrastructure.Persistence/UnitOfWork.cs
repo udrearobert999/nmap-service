@@ -79,6 +79,11 @@ internal sealed class UnitOfWork : IUnitOfWork, IAsyncDisposable
     public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
         _dbContext.SaveChangesAsync(cancellationToken);
 
+    public void Detach(object entity)
+    {
+        _dbContext.Entry(entity).State = EntityState.Detached;
+    }
+
     public bool IsUniqueConstraintViolation(Exception exception)
     {
         return exception is DbUpdateException
