@@ -1,11 +1,28 @@
 # Vantage
 
+> A commanding view of your attack surface and its risk.
+
 ## Introduction
 
-This project is a distributed .NET application composed of two services: a REST API and a background worker.  
-The API communicates asynchronously with the worker through Kafka, while both services share the same SQL database.  
-The full development environment is containerized with Docker Compose for easy setup and local execution.  
-This setup makes it simple to run, test, and extend the application in a consistent way.
+Vantage is a multi-tenant network-security platform that answers two questions
+about your infrastructure: **what is exposed**, and **how dangerous is it**.
+
+It is a distributed, event-driven system of four services: a **REST API** and an
+**nmap scan worker** (.NET 10), a **vulnerability-intelligence service** (Go)
+that correlates discovered services against NVD and the CISA KEV catalogue, and
+a **React portal**. The services communicate asynchronously over Kafka and share
+a PostgreSQL database; every team's data is isolated at the data layer.
+
+The whole environment runs with a single `docker compose up`.
+
+## Documentation
+
+| Document | Answers |
+|---|---|
+| [High-Level Architecture](docs/01-HIGH-LEVEL-ARCHITECTURE.md) | What it is, how it is shaped, and why |
+| [Low-Level Architecture](docs/02-LOW-LEVEL-ARCHITECTURE.md) | Projects, layers, classes, schema, mechanics |
+| [Functionalities Explained](docs/03-FUNCTIONALITIES.md) | Every feature and endpoint, plus what is not built yet |
+| [Patterns and Technologies](docs/04-PATTERNS-AND-TECHNOLOGIES.md) | Every pattern and library, and why each was chosen |
 
 ## Approach
 The REST API handles client requests and publishes messages to Kafka, while the worker consumes those messages and performs background processing.  
