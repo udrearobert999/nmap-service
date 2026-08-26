@@ -117,8 +117,8 @@ is the generalisation signal.
   correct CPE at 0.40 confidence whenever vendor equals product; raising that
   case (and widening the corpus) is the obvious next experiment.
 - **NVD coverage** — CVEs are fetched on demand + cached (not a full mirror);
-  first assessment of a new service makes a network call. A fuller offline sync
-  is future work.
+  first assessment of a new service makes a network call. The client now
+  rate-limits and retries (see below), but a fuller offline sync is future work.
 - **Risk-trend UI** — scan diff now has a page; per-target risk-score history
   over time does not.
 - **Kubernetes** — deferred; everything runs on Docker Compose.

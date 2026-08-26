@@ -55,7 +55,7 @@ func run() error {
 	repo := postgres.NewRepository(pool)
 
 	cpeResolver := cpe.NewResolver()
-	nvdClient := nvd.NewClient()
+	nvdClient := nvd.NewClient(nvd.WithAPIKey(cfg.NVDAPIKey))
 	cveLookup := cve.NewCachedLookup(repo, nvdClient, cveCacheTTL)
 	kevCatalog := kev.NewCatalog()
 	scorer := scoring.NewScorer()

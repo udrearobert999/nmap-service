@@ -259,6 +259,17 @@ the background, and needs no callback infrastructure.
 - **HTTP output cache:** the scans/assessments list endpoints are output-cached
   and **evicted by tag** on create.
 
+### 5.6a Client-side rate limiting & retry (NVD)
+
+The NVD client self-throttles to NVD's published budget — roughly one request
+per 6.5s anonymously, or per 0.7s when `NVD_API_KEY` is set — using a
+monotonic next-slot clock so concurrent assessments queue instead of bursting.
+Failures are retried up to four times with exponential backoff plus jitter,
+honouring a `Retry-After` header when the server sends one. Only throttling and
+server-side faults (429, 403, 5xx, transport errors) are retried; a malformed
+request (4xx) fails immediately rather than burning the budget. Every wait is
+context-aware, so a cancelled assessment stops sleeping straight away.
+
 ### 5.6 Graceful degradation
 
 If NVD is unreachable, the CVE lookup logs a warning and returns what it has

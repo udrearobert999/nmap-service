@@ -13,6 +13,8 @@ type Config struct {
 	KafkaBootstrapServers           string
 	KafkaConsumerGroupID            string
 	ScanRiskAssessmentRequestsTopic string
+
+	NVDAPIKey string
 }
 
 func Load() (Config, error) {
@@ -22,6 +24,7 @@ func Load() (Config, error) {
 		KafkaBootstrapServers:           getEnv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9094"),
 		KafkaConsumerGroupID:            getEnv("KAFKA_CONSUMER_GROUP_ID", "vulnintel-service"),
 		ScanRiskAssessmentRequestsTopic: getEnv("KAFKA_SCAN_RISK_ASSESSMENT_REQUESTS_TOPIC", "scan-risk-assessment-requests-topic"),
+		NVDAPIKey:                       os.Getenv("NVD_API_KEY"),
 	}
 
 	if cfg.PostgresDSN == "" {
