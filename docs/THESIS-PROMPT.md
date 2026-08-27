@@ -42,6 +42,10 @@ below.
   evaluation results, and everything not yet built. Use for chapters 7, 9 and 10.
 - @04-PATTERNS-AND-TECHNOLOGIES.md — every pattern and library with its
   rationale, and the patterns deliberately rejected. Use for chapters 4 and 6.
+- @CODE-EXAMPLES.md — short, real code listings from the codebase, from patterns
+  through to business logic. When a code listing is needed, adapt one of these
+  rather than inventing code. Keep listings between 5 and 20 lines and caption
+  them "Listing X.Y". Use mainly in chapters 4 and 8.
 
 LENGTH — THIS IS A HARD REQUIREMENT
 Minimum 50 pages of body text. Target 70 to 80 pages, approximately 28,600
