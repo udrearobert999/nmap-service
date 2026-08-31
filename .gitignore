@@ -83,3 +83,6 @@ project.fragment.lock.json
 **/obj/
 *bin\\Debug*
 *obj\\Debug*
+
+.env.development
+.env.*.local

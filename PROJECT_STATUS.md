@@ -81,6 +81,22 @@ Two deliberate choices:
   and assessments. The tenant no longer exists, and the rows would otherwise be
   unreachable behind the team query filter.
 
+**Live delivery verified end-to-end** via the Clerk endpoint at
+`https://webhooks.clerk.com/in/c_cIv23iBHsu/` (a pinned relay from
+`clerk webhooks listen`, forwarded to the local API) with a real signing secret
+in `CLERK_WEBHOOK_SIGNING_SECRET`. Created, updated and deleted a real
+organization through the Clerk API and confirmed each event was delivered,
+signature-verified, and applied: the `Team` row appeared on `organization.created`,
+its name changed on `organization.updated`, and it (and its cascaded rows) was
+removed on `organization.deleted`. Real secrets for local runs go in
+`.env.development` (git-ignored; `docker compose --env-file .env.development up`),
+copied from the tracked `.env` template.
+
+`session.claims` was also set on the Clerk instance
+(`{"email": "{{user.primary_email_address}}", "name": "{{user.full_name}}"}`)
+via `clerk config patch`, and verified live: a real JWT now carries an `email`
+claim.
+
 ### Multi-tenancy + auth (Clerk Organizations)
 - `User` + `Team` (= Clerk org) + `TeamMembership` (role), JIT-mirrored from the
   Clerk JWT on each request (`IdentitySyncService`).
@@ -148,14 +164,6 @@ is the generalisation signal.
 
 ## Still to do
 
-- **Clerk session-token custom claims** — Clerk's v2 session token carries no
-  `email`/`name`, so under `Auth__Mode=Clerk` the "created by" column is blank.
-  Add them in the Clerk dashboard (Sessions → customise session token) as
-  `{"email": "{{user.primary_email_address}}", "name": "{{user.full_name}}"}`.
-- **Clerk webhook delivery wiring** — the endpoint, verification and handlers are
-  done and tested; what remains is operational: create the endpoint in the Clerk
-  dashboard, copy its signing secret into `CLERK_WEBHOOK_SIGNING_SECRET`, and
-  expose the API publicly (`clerk webhooks listen` or a tunnel) so events arrive.
 - **CPE confidence calibration** — the evaluation shows the fallback emits the
   correct CPE at 0.40 confidence whenever vendor equals product; raising that
   case (and widening the corpus) is the obvious next experiment.
