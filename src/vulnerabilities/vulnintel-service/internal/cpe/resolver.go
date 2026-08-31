@@ -107,7 +107,7 @@ func dictionaryConfidence(version string) float64 {
 
 func fallbackConfidence(version string) float64 {
 	if version != "" {
-		return 0.4
+		return 0.45
 	}
 	return 0.2
 }

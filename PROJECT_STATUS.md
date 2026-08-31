@@ -121,24 +121,28 @@ claim.
 Reproduce with `go run ./cmd/cpe-eval [-failures]` (or
 `go test ./internal/cpe/eval/ -v`) in `src/vulnerabilities/vulnintel-service`.
 
-A hand-labelled corpus of 34 real `nmap -sV` banners (Metasploitable2, DVWA,
-common services, plus a held-out set of products deliberately absent from the
-dictionary) is scored against a naive baseline that lowercases the product into
-both vendor and product and takes the version verbatim. A sample counts as a
-true positive only when the emitted CPE matches the label exactly and clears the
-confidence threshold; banners with no catalogued product must be abstained on.
+A hand-labelled corpus of 71 real `nmap -sV` banners (Metasploitable2, DVWA,
+common services, an edge-case block covering every dictionary entry and messy
+version strings that weren't previously exercised, plus a held-out set of
+products deliberately absent from the dictionary — 24 of them, each verified
+against the live NVD CPE dictionary API before being added) is scored against
+a naive baseline that lowercases the product into both vendor and product and
+takes the version verbatim. A sample counts as a true positive only when the
+emitted CPE matches the label exactly and clears the confidence threshold;
+banners with no catalogued product must be abstained on.
 
 | resolver | threshold | precision | recall | F1 |
 |---|---|---|---|---|
-| naive | 0.00 | 0.333 | 1.000 | 0.500 |
-| dictionary | 0.00 | 0.818 | 1.000 | 0.900 |
-| dictionary | 0.50 | 1.000 | 0.742 | 0.852 |
-| dictionary | 0.90 | 1.000 | 0.677 | 0.808 |
+| naive | 0.00 | 0.271 | 1.000 | 0.427 |
+| dictionary | 0.00 | 0.757 | 1.000 | 0.862 |
+| dictionary | 0.50 | 1.000 | 0.647 | 0.786 |
+| dictionary | 0.90 | 1.000 | 0.603 | 0.752 |
 
 Findings:
-- Dictionary + version normalisation lifts F1 from 0.500 to 0.900 at the same
-  recall; the naive baseline's precision collapses because distro-patched
-  versions (`4.7p1 Debian 8ubuntu1`) and compound product strings never match.
+- Dictionary + version normalisation lifts F1 well above the naive baseline at
+  the same recall; the naive baseline's precision collapses because
+  distro-patched versions (`4.7p1 Debian 8ubuntu1`) and compound product
+  strings never match.
 - The confidence tier is what buys precision: rejecting below 0.5 removes every
   false positive (1.000 precision) at the cost of recall, so the score is a
   usable abstention signal rather than decoration.
@@ -146,14 +150,30 @@ Findings:
   `mysql:mysql` when NVD publishes `oracle:mysql` (so MySQL CVE lookups silently
   returned nothing), and Tomcat's actual banner
   (`Apache Tomcat/Coyote JSP engine`) fell back to `apache:apache`.
-- Open calibration gap: 4 of the 8 rejections at 0.5 (OpenLDAP, HAProxy,
-  Memcached, Dovecot) emitted the *correct* CPE but scored 0.40. The fallback is
-  right more often than its confidence admits whenever vendor equals product;
-  raising that case would recover recall without costing precision.
+- **Calibration gap, tested and closed**: the original 8-sample held-out set
+  suggested the fallback's vendor==product guess was "usually right" (4/4
+  correct at 0.40 confidence) and that raising its confidence would recover
+  recall for free. Widening the held-out set to 24 NVD-verified samples
+  disproved that harder each time: at 15 samples the guess was right 7/15
+  (46.7%); at 24 it's right 9/24 (37.5%) — Grafana, Zabbix, Fluentd, GitLab,
+  Jenkins, OpenLDAP, HAProxy, Memcached, Dovecot right; Squid, ISC DHCPD,
+  RabbitMQ, Werkzeug, Consul, CouchDB, ZooKeeper, Traefik, Varnish, InfluxDB,
+  Nomad, Vault, Cassandra, Kafka, ActiveMQ wrong. The wrong cases cluster
+  around real orgs/foundations behind a single-word project name (Apache
+  Software Foundation alone accounts for five: Cassandra, Kafka, ActiveMQ,
+  ZooKeeper, CouchDB; HashiCorp for three: Consul, Nomad, Vault) — a
+  structural pattern the resolver has no way to detect from the banner text
+  alone. Raising confidence past the 0.5 acceptance threshold would trade
+  precision for recall, not gain recall for free, and the wider sample makes
+  that tradeoff look worse, not better. Fallback confidence (with a version) is
+  0.45 — matching the measured rate, not the small-sample rate — instead of
+  the original 0.40, but deliberately still below 0.5.
 
-Caveat: the corpus is hand-labelled and small, and the dictionary was corrected
-in response to it, so in-dictionary figures are optimistic. The held-out block
-is the generalisation signal.
+Caveat: the corpus is hand-labelled, and the dictionary was corrected in
+response to it, so in-dictionary figures are optimistic. The held-out block is
+the generalisation signal, and is now large enough (n=24) that the calibration
+finding above is unlikely to be a small-sample artifact the way the original
+n=8 conclusion was.
 
 ### Verified
 - .NET build + 22 unit tests green; Go build/vet/gofmt + cpe/scoring/eval tests
@@ -164,9 +184,6 @@ is the generalisation signal.
 
 ## Still to do
 
-- **CPE confidence calibration** — the evaluation shows the fallback emits the
-  correct CPE at 0.40 confidence whenever vendor equals product; raising that
-  case (and widening the corpus) is the obvious next experiment.
 - **NVD coverage** — CVEs are fetched on demand + cached (not a full mirror);
   first assessment of a new service makes a network call. The client now
   rate-limits and retries (see below), but a fuller offline sync is future work.
