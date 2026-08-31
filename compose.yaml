@@ -94,6 +94,12 @@
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   worker:
     build:
@@ -115,6 +121,8 @@
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
+      api:
+        condition: service_healthy
 
   vulnintel-service:
     build:
@@ -136,6 +144,8 @@
         condition: service_healthy
       kafka-init:
         condition: service_completed_successfully
+      api:
+        condition: service_healthy
 
   portal:
     build:

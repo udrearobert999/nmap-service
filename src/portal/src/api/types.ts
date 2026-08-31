@@ -87,3 +87,15 @@ export interface ListScansParams {
   orderDirection?: "asc" | "desc"
   target?: string
 }
+
+export interface RiskTrendPoint {
+  scanId: string
+  scanRiskAssessmentId: string
+  completedAt: string
+  overallRiskScore: number | null
+}
+
+export interface RiskTrend {
+  target: string
+  points: RiskTrendPoint[]
+}

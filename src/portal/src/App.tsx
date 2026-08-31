@@ -15,6 +15,7 @@ import { DashboardPage } from "@/pages/DashboardPage"
 import { ScansListPage } from "@/pages/ScansListPage"
 import { ScanDetailPage } from "@/pages/ScanDetailPage"
 import { ScanDiffPage } from "@/pages/ScanDiffPage"
+import { RiskTrendPage } from "@/pages/RiskTrendPage"
 import { StatusPage } from "@/pages/StatusPage"
 import { Toaster } from "@/components/ui/sonner"
 
@@ -56,6 +57,7 @@ export default function App() {
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/scans" element={<ScansListPage />} />
                 <Route path="/diff" element={<ScanDiffPage />} />
+                <Route path="/risk-trend" element={<RiskTrendPage />} />
                 <Route path="/scans/:id" element={<ScanDetailPage />} />
                 <Route path="/status" element={<StatusPage />} />
               </Route>

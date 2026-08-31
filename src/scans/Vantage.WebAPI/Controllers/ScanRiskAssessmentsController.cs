@@ -95,4 +95,17 @@ public class ScanRiskAssessmentsController : ApiControllerBase
 
         return result.IsFailure ? HandleFailure(result) : Ok(result.Value);
     }
+
+    [HttpGet("/api/risk-assessments/trend/{target}")]
+    [ProducesResponseType(typeof(GetRiskTrendResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetTrend(
+        [FromRoute] string target,
+        CancellationToken cancellationToken)
+    {
+        var result = await _scanRiskAssessmentsService.GetTrendAsync(target, cancellationToken);
+
+        return result.IsFailure ? HandleFailure(result) : Ok(result.Value);
+    }
 }

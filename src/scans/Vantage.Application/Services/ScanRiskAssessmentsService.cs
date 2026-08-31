@@ -141,4 +141,20 @@ internal sealed class ScanRiskAssessmentsService : IScanRiskAssessmentsService
 
         return Result<GetScanRiskAssessmentResponseDto>.Success(riskAssessment.ToGetResponse());
     }
+
+    public async Task<Result<GetRiskTrendResponseDto>> GetTrendAsync(
+        string target,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new GetRiskTrendRequestDto(target);
+        var validationResult = await _validationOrchestrator.ValidateAsync(request, cancellationToken);
+        if (validationResult.IsFailure)
+        {
+            return Result<GetRiskTrendResponseDto>.ValidationFailure(validationResult.Error);
+        }
+
+        var trend = await _unitOfWork.ScanRiskAssessments.GetTrendByTargetAsync(target, cancellationToken);
+
+        return Result<GetRiskTrendResponseDto>.Success(trend.ToTrendResponse(target));
+    }
 }

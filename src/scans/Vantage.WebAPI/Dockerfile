@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS base
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgssapi-krb5-2 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 USER app
 WORKDIR /app

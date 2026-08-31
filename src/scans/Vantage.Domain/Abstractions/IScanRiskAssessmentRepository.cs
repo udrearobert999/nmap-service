@@ -19,4 +19,7 @@ public interface IScanRiskAssessmentRepository : IRepository<ScanRiskAssessment,
     Task<int> CountByStatusAsync(string? status, CancellationToken cancellationToken = default);
 
     Task<double?> GetAverageOverallRiskScoreAsync(CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ScanRiskAssessment>> GetTrendByTargetAsync(
+        string target, CancellationToken cancellationToken = default);
 }

@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Radar,
   ShieldCheck,
+  TrendingUp,
 } from "lucide-react"
 import {
   Sidebar,
@@ -23,6 +24,7 @@ const navItems = [
   { title: "Dashboard", to: "/", icon: LayoutDashboard, exact: true },
   { title: "Scans", to: "/scans", icon: Radar, exact: false },
   { title: "Diff", to: "/diff", icon: GitCompareArrows, exact: false },
+  { title: "Risk trend", to: "/risk-trend", icon: TrendingUp, exact: false },
   { title: "Status", to: "/status", icon: Activity, exact: false },
 ]
 

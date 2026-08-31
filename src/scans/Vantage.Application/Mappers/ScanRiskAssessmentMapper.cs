@@ -30,6 +30,14 @@ public static class ScanRiskAssessmentMapper
         int totalCount) =>
         new(riskAssessments.Select(r => r.ToDto()).ToList(), totalCount);
 
+    public static RiskTrendPointDto ToTrendPoint(this ScanRiskAssessment riskAssessment) =>
+        new(riskAssessment.ScanId, riskAssessment.Id, riskAssessment.CompletedAt!.Value, riskAssessment.OverallRiskScore);
+
+    public static GetRiskTrendResponseDto ToTrendResponse(
+        this IReadOnlyList<ScanRiskAssessment> riskAssessments,
+        string target) =>
+        new(target, riskAssessments.Select(r => r.ToTrendPoint()).ToList());
+
     public static CreateScanRiskAssessmentResponseDto ToCreateResponse(this ScanRiskAssessment riskAssessment) =>
         new(riskAssessment.Id, riskAssessment.ScanId, riskAssessment.Status, riskAssessment.RequestedAt,
             riskAssessment.CompletedAt);

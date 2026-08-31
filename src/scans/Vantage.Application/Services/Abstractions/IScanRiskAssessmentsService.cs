@@ -27,4 +27,8 @@ public interface IScanRiskAssessmentsService
     public Task<Result<GetScanRiskAssessmentResponseDto>> GetLatestForScanAsync(
         Guid scanId,
         CancellationToken cancellationToken = default);
+
+    public Task<Result<GetRiskTrendResponseDto>> GetTrendAsync(
+        string target,
+        CancellationToken cancellationToken = default);
 }
