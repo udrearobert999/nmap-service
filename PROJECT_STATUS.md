@@ -35,7 +35,10 @@ Patterns: Clean Architecture, Repository, Unit of Work, Transactional Outbox
 - 1-for-1 clone of the scanning pattern (outbox → Kafka → Go worker → shared DB).
 - `POST /api/scans/{scanId}/risk-assessments` (guardrail: scan exists + Completed +
   has results), `GET /api/risk-assessments` (paged/filtered), `GET /api/risk-assessments/{id}`,
-  `GET /api/scans/{scanId}/risk-assessments`, `GET /api/scans/{scanId}/risk-assessment` (latest).
+  `GET /api/scans/{scanId}/risk-assessments`, `GET /api/scans/{scanId}/risk-assessment` (latest),
+  `GET /api/risk-assessments/trend/{target}` (every Completed assessment for a
+  target, ordered by `CompletedAt` — the per-target risk-score-over-time series
+  the portal's Risk trend page charts).
 - **CVE/CPE engine** (Go): CPE resolver (curated vendor:product dict + version
   normalization + confidence), live **NVD** lookup, **CISA KEV** catalog,
   local **CVE cache** (7-day TTL), weighted scoring (CVSS × KEV, heuristic tier
@@ -108,14 +111,54 @@ claim.
 ### Connectivity
 - `GET /api/health` → db + per-service (`scanning`/`assessment`) status from a
   `ServiceHeartbeats` table (each worker upserts every ~10s).
+- Cold-start fix: `vulnintel-service` writes its first heartbeat immediately on
+  boot (`cmd/vulnintel/main.go` — `runHeartbeat` upserts before waiting on the
+  ticker), but `ServiceHeartbeats` only exists once `api`'s EF Core migrations
+  have run (`app.ApplyMigrations()` before `app.Run()` in `Program.cs`).
+  `compose.yaml` used to only gate `worker`/`vulnintel-service` on
+  `postgres: service_healthy` — accepting connections, not "schema exists" —
+  so a fresh volume could race the first heartbeat write against migrations.
+  Fixed by adding a real healthcheck to `api` (`curl -f
+  http://localhost:8080/api/health`, needs `curl` in the API image) and making
+  `worker`/`vulnintel-service` depend on `api: service_healthy`; since Kestrel
+  doesn't start listening until migrations finish, a passing healthcheck is a
+  correct migrations-done signal.
+
+### Dev seed data
+`scripts/seed-dev-data.sql` seeds 3 synthetic targets (`10.20.30.40-42`)
+telling declining/rising/stable risk-score stories, for exercising the diff
+and risk-trend UI locally. Idempotent (deletes/recreates only those targets
+under the chosen team) and parameterized — defaults to `org_e2e`/`dev|e2e-user`
+(API-only, won't show in the browser — see Portal note above), or pass
+`-v team_id=<uuid> -v user_id=<uuid>` for a real signed-in team's UUIDs (not
+its Clerk org id):
+```bash
+docker exec -i vantage_db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+  -v team_id=<team-uuid> -v user_id=<user-uuid> -f - < scripts/seed-dev-data.sql
+```
 
 ### Portal (UI)
-- Clerk sign-in, `<OrganizationSwitcher>`/`<UserButton>`, active-org gate.
+- Clerk sign-in, `<OrganizationSwitcher>`/`<UserButton>`, active-org gate. The
+  portal always requires a real Clerk sign-in in the browser — `Auth__Mode`'s
+  dev-header bypass is API-only (curl/integration tests), the frontend has no
+  equivalent bypass, so a team seeded under a synthetic dev id (e.g. `org_e2e`)
+  never appears in the browser regardless of backend auth mode.
 - Dark neutral + monospace theme, shadcn sidebar shell.
 - Dashboard (`/`): stat cards + scan-activity area chart (recharts).
 - Scans list (`/scans`) + detail with results, risk-assessment panel (findings
   table: CVSS/KEV/confidence badges, matched CVEs), connectivity dots.
+- Scan diff (`/diff`): compare two completed scans of the same target.
+- Risk trend (`/risk-trend`): per-target overall-risk-score line chart across
+  every completed assessment, backed by the trend endpoint above.
 - Clerk widgets dark-themed via `@clerk/themes`.
+
+Two portal instances can be running locally at once and they are not the same
+code: `docker compose`'s `portal` service (`:5173`) runs `npm run dev` *inside
+the container*, rebuilt from `COPY . .` at image-build time, so host edits
+need `docker compose up -d --build portal` to appear there. A separate local
+`vite` dev server on `:5174` (`VITE_API_PROXY_TARGET` defaults to
+`localhost:8080`) proxies to the same containerized API/DB and hot-reloads
+host edits immediately — useful for iterating without rebuilding the image.
 
 ### CPE matching evaluation
 Reproduce with `go run ./cmd/cpe-eval [-failures]` (or
@@ -181,19 +224,26 @@ n=8 conclusion was.
 - Full stack e2e in Docker: scan → risk assessment → real CVE findings (e.g.
   PostgreSQL → 20 CVEs, CVSS 9.8); tenant isolation; connectivity dots.
 - Portal `npm run build` green; dashboard visually verified against the design.
+- Risk trend endpoint + page verified against seeded data in a real
+  browser session (signed-in Clerk org): correct scores, correct tenant
+  isolation (a different team sees an empty trend, not another team's data),
+  400 on an invalid target.
+- Compose healthcheck fix verified structurally (dependency ordering now
+  correctly gates on `api` reaching healthy) via a warm restart; not
+  reproduced against a wiped Postgres volume, since that would have destroyed
+  the real scan/Clerk data from earlier webhook verification in this repo.
 
 ## Still to do
 
 - **NVD coverage** — CVEs are fetched on demand + cached (not a full mirror);
   first assessment of a new service makes a network call. The client now
   rate-limits and retries (see below), but a fuller offline sync is future work.
-- **Risk-trend UI** — scan diff now has a page; per-target risk-score history
-  over time does not.
+  A live CPE-dictionary lookup (rather than the static confidence heuristic)
+  is also the only way to move the CPE fallback's confidence past its current
+  37.5%-measured ceiling — see the calibration finding above.
 - **Kubernetes** — deferred; everything runs on Docker Compose.
 - **Distro-patched false positives** — naive version matching flags e.g.
   Ubuntu-backported Apache; treat as a confidence-tier limitation.
-- **Known nit**: on a cold `docker compose up`, vulnintel logs one heartbeat
-  error before migrations apply, then self-heals.
 
 ## Run
 
